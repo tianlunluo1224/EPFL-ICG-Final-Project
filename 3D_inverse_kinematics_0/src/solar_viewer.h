@@ -18,7 +18,6 @@
 #include "shader.h"
 #include "texture.h"
 #include "planet.h"
-#include "ship.h"
 #include "path.h"
 #include "frame.h"
 #include "billboard.h"
@@ -72,8 +71,6 @@ protected:
     /// update the body positions (called by the timer).
     void update_body_positions();
 
-    void randomize_planets();
-
 private:
 
     /// sphere object
@@ -83,29 +80,11 @@ private:
     Planet sun_;
     /// the mercury object
     Planet mercury_;
-    /// the venus object
-    Planet venus_;
-    /// the earth object
-    Earth  earth_;
-    /// the moon object
-    Planet moon_;
-    /// the mars object
-    Planet mars_;
-    /// the stars object
-    Planet stars_;
-    /// spaceship object
-    Ship ship_;
-    /// sunglow billboard
-    Billboard sunglow_;
 
     /// default color shader (renders only texture)
     Shader   color_shader_;
-    // sun shader (renders the sun: texture plus an optional shimmer effect)
-    Shader   sun_shader_;
     /// phong shader (renders texture and basic illumination)
     Shader   phong_shader_;
-    /// earth shader (renders the earth using multi texturing)
-    Shader   earth_shader_;
 
     /// simple shader for visualizing curves (just using solid color).
     Shader   solid_color_shader_;
@@ -137,12 +116,6 @@ private:
     float y_angle_;
     /// eye's distance in radii from the observed planet
     float dist_factor_;
-    /// true, if we look at the spaceship
-    bool in_ship_;
-    /// x-rotation of the billboard
-    float billboard_x_angle_;
-    /// y-rotation of the billboard
-    float billboard_y_angle_;
 
     /// current viewport dimension
     int  width_, height_;
