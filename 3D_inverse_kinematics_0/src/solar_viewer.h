@@ -20,7 +20,6 @@
 #include "planet.h"
 #include "path.h"
 #include "frame.h"
-#include "billboard.h"
 #include "bezier.h"
 
 
