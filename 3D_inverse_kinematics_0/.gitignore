@@ -1,0 +1,9 @@
+# Visual Studio Code Project Folder
+.vscode/
+
+# Image files
+*.jpg
+*.png
+
+build/
+build_debug/
