@@ -121,26 +121,6 @@ private:
     /// state whether the rendering should be in color or not
     bool greyscale_;
 
-    /// Whether/how to display the ship path curve.
-    enum CurveDisplayMode { CURVE_SHOW_NONE = 0, CURVE_SHOW_PATH = 1, CURVE_SHOW_PATH_CP = 2, CURVE_SHOW_PATH_FRAME = 3, CURVE_SHOW_NUM_MODES = 4 } curve_display_mode_;
-    Path ship_path_renderer_, ship_path_cp_renderer_;
-    Frame ship_path_frame_;
-    float ship_path_param_ = 0; // current parametric distance of ship along the curve
-
-    /// Piecewise degree-3 Bezier spline.
-    PiecewiseBezier ship_path_;
-
-    // Control polygon for cubic spline
-    std::vector<vec3> control_polygon_ = {
-        {2.0, 2.0, 0.0},
-        {3.0, 0.0, 0.0},
-        {3.0, 0.0, -2.0},
-        {0.0, 2.0, -3.0},
-        {-2.0, 2.0, -1.0},
-        {-3.0, 3.0, 0.0},
-        {-1.0, 1.0, 1.0}
-    };
-
     /// the field of view for the camera
     float fovy_;
     /// the near plane for the virtual camera

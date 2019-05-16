@@ -63,10 +63,6 @@ Solar_viewer::Solar_viewer(const char* _title, int _width, int _height)
     y_angle_ = 0.0f;
     dist_factor_ = 4.5f;
 
-    ship_.pos_ = planet_to_look_at_->pos_ - vec4(0.0f, 0.0f, dist_factor_*planet_to_look_at_->radius_, 0.0f);
-    ship_.direction_ = vec4(0.0f, 0.0f, 1.0f,0.0f);
-    in_ship_ = false;
-
     srand((unsigned int)time(NULL));
 }
 
@@ -81,19 +77,10 @@ keyboard(int key, int scancode, int action, int mods)
         // Change view between the various bodies with keys 1..6
         if ((key >= GLFW_KEY_1) && (key <= GLFW_KEY_6)) {
             std::array<const Planet *, 6> bodies = { &sun_, &mercury_, &venus_, &earth_, &moon_, &mars_};
-            in_ship_ = false;
             planet_to_look_at_ = bodies.at(key - GLFW_KEY_1);
         }
         switch (key)
         {
-            // Key 7 switches to viewing the ship.
-            case GLFW_KEY_7:
-            {
-                planet_to_look_at_ = NULL;
-                in_ship_ = true;
-                break;
-            }
-
             /** \todo Implement the ability to change the viewer's distance to the celestial body.
              *    - key 9 should increase and key 8 should decrease the `dist_factor_`
              *    - 2.5 < `dist_factor_` < 20.0
@@ -125,39 +112,6 @@ keyboard(int key, int scancode, int action, int mods)
                 greyscale_ = !greyscale_;
                 break;
             }
-
-            case GLFW_KEY_W:
-            {
-                if (in_ship_)
-                    ship_.accelerate(0.001f);
-                break;
-            }
-            case GLFW_KEY_S:
-            {
-                if (in_ship_)
-                    ship_.accelerate(-0.001f);
-                break;
-            }
-            case GLFW_KEY_A:
-            {
-                if (in_ship_)
-                    ship_.accelerate_angular(0.02f);
-                break;
-            }
-            case GLFW_KEY_D:
-            {
-                if (in_ship_)
-                    ship_.accelerate_angular(-0.02f);
-                break;
-            }
-
-            case GLFW_KEY_C:
-                curve_display_mode_ = CurveDisplayMode((int(curve_display_mode_) + 1) % int(CURVE_SHOW_NUM_MODES));
-                break;
-            case GLFW_KEY_T:
-                ship_path_frame_.toggleParallelTransport();
-                std::cout << (ship_path_frame_.usingParallelTransport() ? "enabled" : "diabled") << " parallel transport" << std::endl;
-                break;
 
             case GLFW_KEY_LEFT:
             {
@@ -267,17 +221,6 @@ void Solar_viewer::timer()
         moon_.time_step(time_step_);
         mars_.time_step(time_step_);
         update_body_positions();
-
-        ship_.update_ship();
-
-        // Desired ship speed (in units of Euclidean distance per animation
-        // frame, not curve parameter distance). This is the (constant)
-        // Euclidean step length we want the ship to make during each time step.
-        const float ship_speed = 0.01f;
-        ship_path_param_ = 0;
-        if (ship_path_param_ >= 1) { ship_path_param_ = 0; }
-        vec3 tangent = ship_path_.tangent(ship_path_param_);
-        ship_path_frame_.alignTo(tangent);
     }
 }
 
@@ -314,7 +257,6 @@ void Solar_viewer::initialize()
     moon_   .tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
     mars_   .tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
     stars_  .tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
-    ship_   .tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
 
     sunglow_.tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
 
@@ -332,9 +274,6 @@ void Solar_viewer::initialize()
     mars_   .tex_.loadPNG(TEXTURE_PATH "/mars.png");
     stars_  .tex_.loadPNG(TEXTURE_PATH "/stars2.png");
 
-    ship_.     load_model(TEXTURE_PATH "/spaceship.off");
-    ship_   .tex_.loadPNG(TEXTURE_PATH "/ship.png");
-
     sunglow_.tex_.createSunBillboardTexture();
 
     // setup shaders
@@ -344,14 +283,6 @@ void Solar_viewer::initialize()
       sun_shader_.load(SHADER_PATH   "/sun.vert", SHADER_PATH   "/sun.frag");
 
     solid_color_shader_.load(SHADER_PATH "/solid_color.vert", SHADER_PATH "/solid_color.frag");
-
-    ship_path_renderer_.initialize();
-    ship_path_cp_renderer_.initialize();
-    ship_path_frame_.initialize();
-
-    ship_path_.set_control_polygon(control_polygon_, true);
-    ship_path_renderer_.sample(ship_path_);
-    ship_path_cp_renderer_.setPoints(ship_path_.bezier_control_points());
 }
 //-----------------------------------------------------------------------------
 
@@ -382,53 +313,32 @@ void Solar_viewer::paint()
     mat4 view; 
     vec4 eye_pos;
 
-    if (in_ship_) {
-        eye_pos = ship_.pos_ - dist_factor_ * ship_.radius_ * ship_.direction_;
-        // Initally, offset the eye_pos from the center of the ship to be a bit above the ship
-        eye_pos[1] = eye_pos[1] + 0.007f;
+    eye_pos = planet_to_look_at_->pos_;
 
-        vec4  center = ship_.pos_;
-        vec4      up = vec4(0,1,0,0);
+    // Initally, offset the eye_pos from the center of the planet, will
+    // be updated by x_angle_ and y_angle_.
+    eye_pos[2] = eye_pos[2] + (dist_factor_ * planet_to_look_at_->radius_);
 
-        mat4 inv_trans = mat4::translate(-vec3(center));
-        mat4 trans = mat4::translate(vec3(center));
-        mat4 rotation_y = mat4::rotate_y(y_angle_);
+    vec4  center = planet_to_look_at_->pos_;
+    vec4      up = vec4(0,1,0,0);
 
-        eye_pos= inv_trans * eye_pos;
-        eye_pos= rotation_y * eye_pos;
-        eye_pos= trans * eye_pos;
+    mat4 inv_trans = mat4::translate(-vec3(center));
+    mat4 trans = mat4::translate(vec3(center));
 
-        view = mat4::look_at(vec3(eye_pos), vec3(center), vec3(up));
+    mat4 rotation_x = mat4::rotate_x(x_angle_); 
+    mat4 rotation_y = mat4::rotate_y(y_angle_); 
 
-    } else {
+    eye_pos = inv_trans * eye_pos; 
+    eye_pos = rotation_x * eye_pos; 
+    eye_pos = rotation_y * eye_pos; 
+    eye_pos = trans * eye_pos; 
 
-        eye_pos = planet_to_look_at_->pos_;
+    up = rotation_x * up; 
+    up = rotation_y * up;
 
-        // Initally, offset the eye_pos from the center of the planet, will
-        // be updated by x_angle_ and y_angle_.
-        eye_pos[2] = eye_pos[2] + (dist_factor_ * planet_to_look_at_->radius_);
-
-        vec4  center = planet_to_look_at_->pos_;
-        vec4      up = vec4(0,1,0,0);
-
-        mat4 inv_trans = mat4::translate(-vec3(center));
-        mat4 trans = mat4::translate(vec3(center));
-
-        mat4 rotation_x = mat4::rotate_x(x_angle_); 
-        mat4 rotation_y = mat4::rotate_y(y_angle_); 
-
-        eye_pos = inv_trans * eye_pos; 
-        eye_pos = rotation_x * eye_pos; 
-        eye_pos = rotation_y * eye_pos; 
-        eye_pos = trans * eye_pos; 
-
-        up = rotation_x * up; 
-        up = rotation_y * up;
-
-        view = mat4::look_at(vec3(eye_pos), vec3(center), vec3(up));
+    view = mat4::look_at(vec3(eye_pos), vec3(center), vec3(up));
 
 
-    }
     /** \todo Orient the billboard used to display the sun's glow
      *  Update billboard_x_andle_ and billboard_y_angle_ so that the billboard plane
      *  drawn to produce the sun's halo is orthogonal to the view vector for
@@ -467,23 +377,6 @@ void Solar_viewer::paint()
 
 void Solar_viewer::draw_scene(mat4& _projection, mat4& _view)
 {
-    switch (curve_display_mode_) {
-        case CURVE_SHOW_PATH_FRAME:
-            ship_path_frame_.draw(solid_color_shader_, _projection * _view, ship_path_(ship_path_param_));
-        case CURVE_SHOW_PATH_CP:
-            solid_color_shader_.use();
-            solid_color_shader_.set_uniform("modelview_projection_matrix", _projection * _view);
-            solid_color_shader_.set_uniform("color", vec4(0.8f, 0.8f, 0.8f, 1.0f));
-            ship_path_cp_renderer_.draw();
-        case CURVE_SHOW_PATH:
-            solid_color_shader_.use();
-            solid_color_shader_.set_uniform("modelview_projection_matrix", _projection * _view);
-            solid_color_shader_.set_uniform("color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
-            ship_path_renderer_.draw();
-        default:
-            break;
-    }
-
     // the matrices we need: model, modelview, modelview-projection, normal
     mat4 m_matrix;
     mat4 mv_matrix;
@@ -629,25 +522,6 @@ void Solar_viewer::draw_scene(mat4& _projection, mat4& _view)
     phong_shader_.set_uniform("greyscale", (int)greyscale_);
     moon_.tex_.bind();
     unit_sphere_.draw();
-
-
-    // render ship
-    mat4 trans_ship = mat4::translate(vec3(ship_.pos_));
-    m_matrix = trans_ship * mat4::rotate_y(ship_.angle_) * mat4::scale(ship_.radius_);
-    mv_matrix = _view * m_matrix;
-    mvp_matrix = _projection * mv_matrix;
-    n_matrix = transpose(inverse(mat3(mv_matrix))); 
-    phong_shader_.use();
-    phong_shader_.set_uniform("modelview_projection_matrix", mvp_matrix);
-    phong_shader_.set_uniform("modelview_matrix", mv_matrix);
-    phong_shader_.set_uniform("normal_matrix", n_matrix);
-    phong_shader_.set_uniform("t", sun_animation_time, true /* true  Indicate that time parameter is optional;
-                                                             it may be optimized away by the GLSL    compiler if it's unused. */);
-    phong_shader_.set_uniform("tex", 0);
-    phong_shader_.set_uniform("light_position", _view * sun_.pos_);
-    phong_shader_.set_uniform("greyscale", (int)greyscale_);
-    ship_.tex_.bind();
-    ship_.draw();
 
     // background (stars)
     m_matrix = mat4::scale(stars_.radius_);
