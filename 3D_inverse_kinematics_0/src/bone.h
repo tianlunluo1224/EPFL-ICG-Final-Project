@@ -16,7 +16,14 @@
 class Bone: public Object
 {
 public:
+    /// Origin, Orientation and Height is everything we need to uniquely
+    /// define a bones' spatial extents (except for the radius)
+    float height_;
 
+    /// main diffuse texture for the planet
+    Texture tex_;
+
+public:
     /// default constructor
     Bone(const vec4 _origin,
            const vec3 _orientation,
@@ -32,13 +39,6 @@ public:
         // angle_orbit_ = fmod(angle_orbit_ + _days * angle_step_orbit_, 360.0);
         // angle_self_  = fmod(angle_self_  + _days * angle_step_self_,  360.0);
     }
-
-    /// Origin, Orientation and Height is everything we need to uniquely
-    /// define a bones' spatial extents (except for the radius)
-    float height_;
-
-    /// main diffuse texture for the planet
-    Texture tex_;
 };
 
 

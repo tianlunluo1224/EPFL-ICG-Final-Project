@@ -17,7 +17,20 @@
 class Object
 {
 public:
+    /// the current position of the object
+    vec4 origin_;
 
+    /// the current orientation of the object
+    /// roll(z), pitch(x), yaw(y)
+    vec3 orientation_;
+
+    /// the scaling factor of the object
+    float scale_;
+
+    /// main diffuse texture for the object
+    Texture tex_;
+
+public:
     /// default constructor
     Object(const vec4 _origin,
            const vec3 _orientation,
@@ -40,18 +53,6 @@ public:
     virtual void update_position(const vec4 _prev_endpoint, const vec4 _prev_orientation)
     {}
 
-    /// the current position of the object
-    vec4 origin_;
-
-    /// the current orientation of the object
-    /// roll(z), pitch(x), yaw(y)
-    vec3 orientation_;
-
-    /// the scaling factor of the object
-    float scale_;
-
-    /// main diffuse texture for the object
-    Texture tex_;
 };
 
 
