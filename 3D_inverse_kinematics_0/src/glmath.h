@@ -271,7 +271,7 @@ inline const vec3 reflect(const vec3& v, const vec3& n)
 
 /// Interpolate between a and b.
 inline vec3 mix(vec3 const& a, vec3 const& b, float t) {
-    return a * (1.-t) + b * t;
+    return a * (1.0f-t) + b * t;
 }
 
 /// read the space-separated components of a vector from a stream

@@ -40,7 +40,7 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         std::vector<GLuint> indices(m_num_pts);
-        for (size_t i = 0; i < m_num_pts; ++i) indices[i] = i;
+        for (size_t i = 0; i < (size_t) m_num_pts; ++i) indices[i] = i;
 
         glBindVertexArray(m_vao);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
@@ -51,7 +51,7 @@ public:
     template<typename F>
     void sample(const F &f) {
         std::vector<vec3> pts;
-        for (size_t i = 0; i < m_resolution; ++i)
+        for (size_t i = 0; i < (size_t) m_resolution; ++i)
             pts.push_back(f(i / float(m_resolution - 1)));
         setPoints(pts);
     }
