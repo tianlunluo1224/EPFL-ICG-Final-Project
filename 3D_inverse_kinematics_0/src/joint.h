@@ -17,12 +17,12 @@
 
 
 /// default class for the planet
-class Planet
+class Joint
 {
 public:
 
     /// default constructor
-    Planet(const float _angle_step_orbit,
+    Joint(const float _angle_step_orbit,
            const float _angle_step_self,
            const float _radius,
            const float _distance) :
@@ -69,7 +69,7 @@ public:
 
 
 /// earth is a special planet, because we need access to more textures
-class Earth : public Planet
+class Earth : public Joint
 {
 public:
 
@@ -78,7 +78,7 @@ public:
           const float _update_self,
           const float _scale,
           const float _distance)
-        :Planet(_update, _update_self,_scale, _distance){}
+        :Joint(_update, _update_self,_scale, _distance){}
 
     /// diffuse texture for the night
     Texture night_;

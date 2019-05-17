@@ -18,7 +18,7 @@
 #include "cylinder.h"
 #include "shader.h"
 #include "texture.h"
-#include "planet.h"
+#include "joint.h"
 #include "path.h"
 #include "frame.h"
 #include "bezier.h"
@@ -74,9 +74,9 @@ private:
     Cylinder unit_cylinder_;
 
     /// the light object
-    Planet light_;
+    Joint light_;
     /// the bone object
-    Planet bone_;
+    Joint bone_;
 
     /// default color shader (renders only texture)
     Shader   color_shader_;
@@ -105,7 +105,7 @@ private:
     float far_;
 
     /// which object are we looking at (control with key 1-6)
-    const Planet* object_to_look_at_;
+    const Joint* object_to_look_at_;
 
     /// rotation in x direction around the planet/sun from the original point
     float x_angle_;
