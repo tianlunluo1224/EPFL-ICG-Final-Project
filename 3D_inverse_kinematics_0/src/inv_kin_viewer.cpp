@@ -1,9 +1,6 @@
 //=============================================================================
 //
-//   Exercise code for the lecture "Introduction to Computer Graphics"
-//     by Prof. Mario Botsch, Bielefeld University
-//
-//   Copyright (C) by Computer Graphics Group, Bielefeld University
+// Documentation here
 //
 //=============================================================================
 
@@ -180,6 +177,7 @@ void Inv_kin_viewer::initialize()
 
     // Load/generate textures
     light_    .tex_.loadPNG(TEXTURE_PATH "/sun.png");
+    bone_    .tex_.loadPNG(TEXTURE_PATH "/day.png");
 
     // setup shaders
     color_shader_.load(SHADER_PATH "/color.vert", SHADER_PATH "/color.frag");
@@ -247,7 +245,7 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     static float sun_animation_time = 0;
     if (timer_active_) sun_animation_time += 0.01f;
 
-    // render sun
+    // render light
     m_matrix = mat4::rotate_y(0.0f) * mat4::scale(light_.scale_);
     mv_matrix = _view * m_matrix;
     mvp_matrix = _projection * mv_matrix;
@@ -264,8 +262,8 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     unit_sphere_.draw();
 
     // render bone
-    mat4 trans_mercury = mat4::translate(vec3(bone_.origin_));
-    m_matrix = trans_mercury * mat4::rotate_y(0.0f) * mat4::scale(bone_.scale_);
+    mat4 trans_bone = mat4::translate(vec3(bone_.origin_));
+    m_matrix = trans_bone * mat4::rotate_y(0.0f) * mat4::scale(bone_.scale_);
     mv_matrix = _view * m_matrix;
     mvp_matrix = _projection * mv_matrix;
     n_matrix = transpose(inverse(mat3(mv_matrix))); 
