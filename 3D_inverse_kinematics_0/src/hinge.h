@@ -19,9 +19,6 @@ public:
     /// angle of rotation around _base_orientation.x axis, 0 degrees is straight
     float rot_angle_;
 
-    /// main diffuse texture for the planet
-    Texture tex_;
-
 public:
     /// default constructor
     Hinge(const vec4 _base,

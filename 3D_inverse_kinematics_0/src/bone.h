@@ -20,9 +20,6 @@ public:
     /// define a bones' spatial extents (except for the radius)
     float height_;
 
-    /// main diffuse texture for the planet
-    Texture tex_;
-
 public:
     /// default constructor
     Bone(const vec4 _base,
