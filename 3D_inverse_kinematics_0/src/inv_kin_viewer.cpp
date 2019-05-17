@@ -7,7 +7,7 @@
 //
 //=============================================================================
 
-#include "solar_viewer.h"
+#include "Inv_kin_viewer.h"
 #include "glmath.h"
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
@@ -16,7 +16,7 @@
 //=============================================================================
 
 
-Solar_viewer::Solar_viewer(const char* _title, int _width, int _height)
+Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
     : GLFW_window(_title, _width, _height),
       unit_sphere_(50), //level of tesselation
       unit_cylinder_(50), //level of tesselation
@@ -47,7 +47,7 @@ Solar_viewer::Solar_viewer(const char* _title, int _width, int _height)
 //-----------------------------------------------------------------------------
 
 void
-Solar_viewer::
+Inv_kin_viewer::
 keyboard(int key, int scancode, int action, int mods)
 {
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
@@ -132,8 +132,8 @@ keyboard(int key, int scancode, int action, int mods)
 
 // Update the current positions of the celestial bodies based their angular distance
 // around their orbits. This position is needed to set up the camera in the scene
-// (see Solar_viewer::paint)
-void Solar_viewer::update_body_positions() {
+// (see Inv_kin_viewer::paint)
+void Inv_kin_viewer::update_body_positions() {
     
     vec4 bone_initial(bone_.distance_, 0, 0, 1);
     bone_.pos_ = mat4::rotate_y(bone_.angle_orbit_) * bone_initial;
@@ -142,7 +142,7 @@ void Solar_viewer::update_body_positions() {
 //-----------------------------------------------------------------------------
 
 
-void Solar_viewer::timer()
+void Inv_kin_viewer::timer()
 {
     if (timer_active_) {
         universe_time_ += time_step_;
@@ -158,7 +158,7 @@ void Solar_viewer::timer()
 //-----------------------------------------------------------------------------
 
 
-void Solar_viewer::resize(int _width, int _height)
+void Inv_kin_viewer::resize(int _width, int _height)
 {
     width_  = _width;
     height_ = _height;
@@ -168,7 +168,7 @@ void Solar_viewer::resize(int _width, int _height)
 //-----------------------------------------------------------------------------
 
 
-void Solar_viewer::initialize()
+void Inv_kin_viewer::initialize()
 {
     // set initial state
     glClearColor(1,1,1,0);
@@ -190,7 +190,7 @@ void Solar_viewer::initialize()
 //-----------------------------------------------------------------------------
 
 
-void Solar_viewer::paint()
+void Inv_kin_viewer::paint()
 {
     // clear framebuffer and depth buffer first
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -231,7 +231,7 @@ void Solar_viewer::paint()
 //-----------------------------------------------------------------------------
 
 
-void Solar_viewer::draw_scene(mat4& _projection, mat4& _view)
+void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
 {
     // the matrices we need: model, modelview, modelview-projection, normal
     mat4 m_matrix;

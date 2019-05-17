@@ -7,14 +7,14 @@
 //
 //=============================================================================
 
-#include "solar_viewer.h"
+#include "inv_kin_viewer.h"
 
 //=============================================================================
 
 
 int main(int argc, char *argv[])
 {
-    Solar_viewer window("Solar Sytem", 640, 480);
+    Inv_kin_viewer window("Inverse Kinematics Demo", 640, 480);
     return window.run();
 }
 

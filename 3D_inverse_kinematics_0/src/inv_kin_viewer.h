@@ -6,8 +6,8 @@
 //   Copyright (C) by Computer Graphics Group, Bielefeld University
 //
 //=============================================================================
-#ifndef SOLAR_VIEWER_H
-#define SOLAR_VIEWER_H
+#ifndef Inv_kin_viewer_H
+#define Inv_kin_viewer_H
 //=============================================================================
 
 
@@ -28,7 +28,7 @@
 
 
 /// OpenGL viewer that handles all the rendering for us
-class Solar_viewer : public GLFW_window
+class Inv_kin_viewer : public GLFW_window
 {
 public:
 
@@ -36,7 +36,7 @@ public:
     /// \_title the window's title
     /// \_width the window's width
     /// \_height the window's height
-    Solar_viewer(const char* _title, int _width, int _height);
+    Inv_kin_viewer(const char* _title, int _width, int _height);
 
 
 protected:
