@@ -21,8 +21,8 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
       unit_sphere_(50), //level of tesselation
       unit_cylinder_(50), //level of tesselation
       
-      //       origin     scale       rot_axis
-      light_    (vec4(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, vec4(0.0f, 1.0f, 0.0f, 0.0f)),
+      //         origin                        orientation             scale (height)
+      light_    (vec4(0.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 1.0f),
       bone_     (vec4(2.0f, 0.0f, 0.0f, 1.0f), 0.5f, vec4(0.0f, 1.0f, 0.0f, 0.0f))
 {
     // start animation

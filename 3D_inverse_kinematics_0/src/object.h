@@ -19,9 +19,11 @@ class Object
 public:
 
     /// default constructor
-    Object(vec4 _origin,
+    Object(const vec4 _origin,
+           const vec3 _orientation,
            const float _scale) :
         origin_(_origin),
+        orientation_(_orientation),
         scale_(_scale)
     {}
 
@@ -34,6 +36,10 @@ public:
 
     /// the current position of the object
     vec4 origin_;
+
+    /// the current orientation of the object
+    /// roll(z), pitch(x), yaw(y)
+    vec3 orientation_;
 
     /// the scaling factor of the object
     float scale_;

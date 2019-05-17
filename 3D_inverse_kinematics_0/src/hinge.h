@@ -1,9 +1,6 @@
 //=============================================================================
 //
-//   Exercise code for the lecture "Introduction to Computer Graphics"
-//     by Prof. Mario Botsch, Bielefeld University
-//
-//   Copyright (C) by Computer Graphics Group, Bielefeld University
+// Documentation here
 //
 //=============================================================================
 #ifndef HINGE_H
@@ -21,11 +18,10 @@ class Hinge: public Object
 public:
 
     /// default constructor
-    Hinge(vec4 _origin,
-           const float _scale,
-           vec4 _rot_axis) :
-        Object(_origin, _scale),
-        rot_axis_(_rot_axis),
+    Hinge(const vec4 _origin,
+           const vec3 _orientation,
+           const float _scale) :
+        Object(_origin, _orientation, _scale),
         rot_angle_(0.0f)
     {}
 
@@ -35,8 +31,6 @@ public:
         // angle_orbit_ = fmod(angle_orbit_ + _days * angle_step_orbit_, 360.0);
         // angle_self_  = fmod(angle_self_  + _days * angle_step_self_,  360.0);
     }
-
-    vec4 rot_axis_;
 
     float rot_angle_;
 
