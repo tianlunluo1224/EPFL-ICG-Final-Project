@@ -27,12 +27,6 @@
 //=============================================================================
 
 
-enum PLANET {SUN=0, MERCURY=1,VENUS=2, EARTH=3, MOON=4, MARS=5};
-
-
-//=============================================================================
-
-
 /// OpenGL viewer that handles all the rendering for us
 class Solar_viewer : public GLFW_window
 {
