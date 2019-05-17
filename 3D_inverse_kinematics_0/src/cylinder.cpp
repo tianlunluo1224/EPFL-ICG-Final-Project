@@ -54,19 +54,19 @@ void Cylinder::initialize()
     unsigned int p(0), n(0), t(0), i(0), tan(0), bitan(0);
 
     // generate vertices
-    for (unsigned int iv=0; iv<v_resolution; ++iv)
+    for (unsigned int iv = 0; iv < v_resolution; ++iv)
     {
-        for (unsigned int iu=0; iu<u_resolution; ++iu)
+        for (unsigned int iu = 0; iu < u_resolution; ++iu)
         {
-            float u = (float) iu / (float) (u_resolution-1);
-            float v = (float) iv / (float) (v_resolution-1);
+            float u = (float) iu / (float) (u_resolution - 1);
+            float v = (float) iv / (float) (v_resolution - 1);
 
-            float theta = u * 2.0 * M_PI;
-            float h   = v;
+            float theta = u * 2.0f * (float) M_PI;
+            float h     = v;
 
             float x = cos(theta);
-            float y = h;
-            float z = sin(theta);
+            float y = sin(theta);
+            float z = h;
 
             positions[p++] = x;
             positions[p++] = y;
@@ -76,8 +76,8 @@ void Cylinder::initialize()
             normals[n++] = y;
             normals[n++] = z;
 
-            texcoords[t++] = 1.0-u;
-            texcoords[t++] = 1.0-v;
+            texcoords[t++] = 1.0f - u;
+            texcoords[t++] = 1.0f - v;
         }
     }
 
