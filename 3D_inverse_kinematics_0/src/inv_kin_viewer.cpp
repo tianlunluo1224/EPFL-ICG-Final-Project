@@ -20,7 +20,7 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
       
       //         origin                        orientation             scale (height)
       light_    (vec4(0.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 1.0f),
-      bone_     (vec4(2.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f, 1.0f)
+      bone_     (vec4(2.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f, 2.0f)
 {
     // start animation
     timer_active_ = true;
@@ -131,9 +131,8 @@ keyboard(int key, int scancode, int action, int mods)
 // around their orbits. This position is needed to set up the camera in the scene
 // (see Inv_kin_viewer::paint)
 void Inv_kin_viewer::update_body_positions() {
-    
-    // vec4 bone_initial(bone_.distance_, 0, 0, 1);
-    // bone_.base_ = mat4::rotate_y(bone_.angle_orbit_) * bone_initial;
+    light_.base_orientation_.yaw += 0.1f;
+    bone_.base_orientation_.pitch += 0.5f;
 }
 
 //-----------------------------------------------------------------------------
@@ -233,6 +232,7 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
 {
     // the matrices we need: model, modelview, modelview-projection, normal
     mat4 m_matrix;
+    mat4 obj_rot_matrix;
     mat4 mv_matrix;
     mat4 mvp_matrix;
     mat3 n_matrix;
@@ -246,7 +246,7 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     if (timer_active_) sun_animation_time += 0.01f;
 
     // render light
-    m_matrix = mat4::rotate_y(0.0f) * mat4::scale(light_.scale_);
+    m_matrix = mat4::rotate_y(light_.base_orientation_.yaw) * mat4::scale(light_.scale_);
     mv_matrix = _view * m_matrix;
     mvp_matrix = _projection * mv_matrix;
     phong_shader_.use();
@@ -263,7 +263,8 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
 
     // render bone
     mat4 trans_bone = mat4::translate(vec3(bone_.base_));
-    m_matrix = trans_bone * mat4::rotate_y(0.0f) * mat4::scale(bone_.scale_);
+    obj_rot_matrix = mat4::rotate_y(bone_.base_orientation_.yaw) * mat4::rotate_x(bone_.base_orientation_.pitch) * mat4::rotate_z(bone_.base_orientation_.roll);
+    m_matrix = trans_bone * obj_rot_matrix * mat4::scale(bone_.scale_, 0.2 * bone_.scale_, bone_.height_);
     mv_matrix = _view * m_matrix;
     mvp_matrix = _projection * mv_matrix;
     n_matrix = transpose(inverse(mat3(mv_matrix))); 
