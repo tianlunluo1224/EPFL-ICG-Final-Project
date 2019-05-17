@@ -86,19 +86,6 @@ public:
     /// construct with x,y,z values
     vec3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
 
-    /// construct from a vec4
-    vec3(vec4 _v) {
-        if (_v.w == 0.0f) {
-            x = _v.x;
-            y = _v.y;
-            z = _v.z;
-        } else {
-            x = _v.x / _v.w;
-            y = _v.y / _v.w;
-            z = _v.z / _v.w;
-        }
-    }
-
     /// return pointer to array/vector (for passing it to OpenGL)
     const float* data() const { return &x; }
 
