@@ -21,7 +21,7 @@ Solar_viewer::Solar_viewer(const char* _title, int _width, int _height)
       unit_sphere_(50), //level of tesselation
       
       //       orbit period     self-rotation       radius   distance
-      sun_    (0.0f,            360.f/26.0f,        1.0f,    0.0f),
+      light_    (0.0f,            360.f/26.0f,        1.0f,    0.0f),
       mercury_(360.f/116.0f,    360.f/58.5f,        0.075f, -1.4f)
 {
     // start animation
@@ -35,7 +35,7 @@ Solar_viewer::Solar_viewer(const char* _title, int _width, int _height)
     far_  = 20;
 
     // initial viewing setup
-    planet_to_look_at_ = &sun_;
+    planet_to_look_at_ = &light_;
     x_angle_ = 0.0f;
     y_angle_ = 0.0f;
     dist_factor_ = 4.5f;
@@ -147,7 +147,7 @@ void Solar_viewer::timer()
         universe_time_ += time_step_;
         //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
-        sun_.time_step(time_step_);
+        light_.time_step(time_step_);
         mercury_.time_step(time_step_);
         update_body_positions();
     }
@@ -174,11 +174,11 @@ void Solar_viewer::initialize()
     glEnable(GL_DEPTH_TEST);
 
     // Allocate textures
-    sun_    .tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+    light_    .tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
     mercury_.tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
 
     // Load/generate textures
-    sun_    .tex_.loadPNG(TEXTURE_PATH "/sun.png");
+    light_    .tex_.loadPNG(TEXTURE_PATH "/sun.png");
 
     // setup shaders
     color_shader_.load(SHADER_PATH "/color.vert", SHADER_PATH "/color.frag");
@@ -247,7 +247,7 @@ void Solar_viewer::draw_scene(mat4& _projection, mat4& _view)
     if (timer_active_) sun_animation_time += 0.01f;
 
     // render sun
-    m_matrix = mat4::rotate_y(sun_.angle_self_) * mat4::scale(sun_.radius_);
+    m_matrix = mat4::rotate_y(light_.angle_self_) * mat4::scale(light_.radius_);
     mv_matrix = _view * m_matrix;
     mvp_matrix = _projection * mv_matrix;
     phong_shader_.use();
@@ -257,9 +257,9 @@ void Solar_viewer::draw_scene(mat4& _projection, mat4& _view)
     phong_shader_.set_uniform("t", sun_animation_time, true /* Indicate that time parameter is optional;
                                                              it may be optimized away by the GLSL    compiler if it's unused. */);
     phong_shader_.set_uniform("tex", 0);
-    phong_shader_.set_uniform("light_position", _view * sun_.pos_);
+    phong_shader_.set_uniform("light_position", _view * light_.pos_);
     phong_shader_.set_uniform("greyscale", (int)greyscale_);
-    sun_.tex_.bind();
+    light_.tex_.bind();
     unit_sphere_.draw();
 
     // render mercury
@@ -274,7 +274,7 @@ void Solar_viewer::draw_scene(mat4& _projection, mat4& _view)
     phong_shader_.set_uniform("normal_matrix", n_matrix);
     phong_shader_.set_uniform("t", sun_animation_time, true /* Indicate that time parameter is optional;
                                                              it may be optimized away by the GLSL    compiler if it's unused. */);
-    phong_shader_.set_uniform("light_position", _view * sun_.pos_);
+    phong_shader_.set_uniform("light_position", _view * light_.pos_);
     phong_shader_.set_uniform("tex", 0);
     phong_shader_.set_uniform("greyscale", (int)greyscale_);
     mercury_.tex_.bind();

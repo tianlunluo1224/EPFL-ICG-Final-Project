@@ -76,8 +76,8 @@ private:
     /// sphere object
     Cylinder unit_sphere_;
 
-    /// the sun object
-    Planet sun_;
+    /// the light object
+    Planet light_;
     /// the mercury object
     Planet mercury_;
 
