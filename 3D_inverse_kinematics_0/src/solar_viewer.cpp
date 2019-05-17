@@ -19,6 +19,7 @@
 Solar_viewer::Solar_viewer(const char* _title, int _width, int _height)
     : GLFW_window(_title, _width, _height),
       unit_sphere_(50), //level of tesselation
+      unit_cylinder_(50), //level of tesselation
       
       //       orbit period     self-rotation       radius   distance
       light_    (0.0f,            360.f/26.0f,        1.0f,    0.0f),
@@ -278,7 +279,7 @@ void Solar_viewer::draw_scene(mat4& _projection, mat4& _view)
     phong_shader_.set_uniform("tex", 0);
     phong_shader_.set_uniform("greyscale", (int)greyscale_);
     bone_.tex_.bind();
-    unit_sphere_.draw();
+    unit_cylinder_.draw();
 
     glDisable(GL_BLEND);
 

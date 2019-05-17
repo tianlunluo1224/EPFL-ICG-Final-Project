@@ -68,7 +68,10 @@ protected:
 private:
 
     /// sphere object
-    Cylinder unit_sphere_;
+    Sphere unit_sphere_;
+
+    /// cylinder object
+    Cylinder unit_cylinder_;
 
     /// the light object
     Planet light_;
