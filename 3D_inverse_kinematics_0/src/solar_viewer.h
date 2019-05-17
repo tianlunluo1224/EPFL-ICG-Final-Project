@@ -101,8 +101,8 @@ private:
     /// the far plane for the virtual camera
     float far_;
 
-    /// which planet are we looking at (control with key 1-6)
-    const Planet* planet_to_look_at_;
+    /// which object are we looking at (control with key 1-6)
+    const Planet* object_to_look_at_;
 
     /// rotation in x direction around the planet/sun from the original point
     float x_angle_;

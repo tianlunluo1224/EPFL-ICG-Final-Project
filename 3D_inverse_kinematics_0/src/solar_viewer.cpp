@@ -35,7 +35,7 @@ Solar_viewer::Solar_viewer(const char* _title, int _width, int _height)
     far_  = 20;
 
     // initial viewing setup
-    planet_to_look_at_ = &light_;
+    object_to_look_at_ = &light_;
     x_angle_ = 0.0f;
     y_angle_ = 0.0f;
     dist_factor_ = 4.5f;
@@ -197,13 +197,13 @@ void Solar_viewer::paint()
     mat4 view; 
     vec4 eye_pos;
 
-    eye_pos = planet_to_look_at_->pos_;
+    eye_pos = object_to_look_at_->pos_;
 
     // Initally, offset the eye_pos from the center of the planet, will
     // be updated by x_angle_ and y_angle_.
-    eye_pos[2] = eye_pos[2] + (dist_factor_ * planet_to_look_at_->radius_);
+    eye_pos[2] = eye_pos[2] + (dist_factor_ * object_to_look_at_->radius_);
 
-    vec4  center = planet_to_look_at_->pos_;
+    vec4  center = object_to_look_at_->pos_;
     vec4      up = vec4(0,1,0,0);
 
     mat4 inv_trans = mat4::translate(-vec3(center));
