@@ -15,6 +15,7 @@
 #include "glfw_window.h"
 
 #include "sphere.h"
+#include "cylinder.h"
 #include "shader.h"
 #include "texture.h"
 #include "planet.h"
@@ -73,7 +74,7 @@ protected:
 private:
 
     /// sphere object
-    Sphere unit_sphere_;
+    Cylinder unit_sphere_;
 
     /// the sun object
     Planet sun_;
