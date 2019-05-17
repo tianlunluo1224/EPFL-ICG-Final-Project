@@ -17,12 +17,12 @@
 class Object
 {
 public:
-    /// the current position of the object
-    vec4 origin_;
+    /// the current position of the object's base
+    vec4 base_;
 
     /// the current orientation of the object
     /// roll(z), pitch(x), yaw(y)
-    vec3 orientation_;
+    vec3 base_orientation_;
 
     /// the scaling factor of the object
     float scale_;
@@ -32,11 +32,11 @@ public:
 
 public:
     /// default constructor
-    Object(const vec4 _origin,
-           const vec3 _orientation,
+    Object(const vec4 _base,
+           const vec3 _base_orientation,
            const float _scale) :
-        origin_(_origin),
-        orientation_(_orientation),
+        base_(_base),
+        base_orientation_(_base_orientation),
         scale_(_scale)
     {}
 

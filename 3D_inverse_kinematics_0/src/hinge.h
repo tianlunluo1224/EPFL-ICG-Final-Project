@@ -16,7 +16,7 @@
 class Hinge: public Object
 {
 public:
-    /// angle of rotation around _orientation.z axis
+    /// angle of rotation around _base_orientation.x axis, 0 degrees is straight
     float rot_angle_;
 
     /// main diffuse texture for the planet
@@ -24,10 +24,10 @@ public:
 
 public:
     /// default constructor
-    Hinge(const vec4 _origin,
-           const vec3 _orientation,
+    Hinge(const vec4 _base,
+           const vec3 _base_orientation,
            const float _scale) :
-        Object(_origin, _orientation, _scale),
+        Object(_base, _base_orientation, _scale),
         rot_angle_(0.0f)
     {}
 

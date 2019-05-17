@@ -25,11 +25,11 @@ public:
 
 public:
     /// default constructor
-    Bone(const vec4 _origin,
+    Bone(const vec4 _base,
            const vec3 _orientation,
            const float _scale,
            const float _height) :
-        Object(_origin, _orientation, _scale),
+        Object(_base, _orientation, _scale),
         height_(_height)
     {}
 
