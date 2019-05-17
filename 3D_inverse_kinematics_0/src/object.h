@@ -50,7 +50,7 @@ public:
     virtual void update_dof(std::vector<float> values)
     {}
 
-    virtual void update_position(const vec4 _prev_endpoint, const vec4 _prev_orientation)
+    virtual void update_position(const vec4 _prev_endpoint, const vec3 _prev_orientation)
     {}
 
 };
