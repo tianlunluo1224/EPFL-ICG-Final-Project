@@ -22,7 +22,7 @@ Solar_viewer::Solar_viewer(const char* _title, int _width, int _height)
       
       //       orbit period     self-rotation       radius   distance
       light_    (0.0f,            360.f/26.0f,        1.0f,    0.0f),
-      mercury_(360.f/116.0f,    360.f/58.5f,        0.075f, -1.4f)
+      bone_(360.f/116.0f,    360.f/58.5f,        0.075f, -1.4f)
 {
     // start animation
     timer_active_ = true;
@@ -134,8 +134,8 @@ keyboard(int key, int scancode, int action, int mods)
 // (see Solar_viewer::paint)
 void Solar_viewer::update_body_positions() {
     
-    vec4 mercury_initial(mercury_.distance_, 0, 0, 1);
-    mercury_.pos_ = mat4::rotate_y(mercury_.angle_orbit_) * mercury_initial;
+    vec4 bone_initial(bone_.distance_, 0, 0, 1);
+    bone_.pos_ = mat4::rotate_y(bone_.angle_orbit_) * bone_initial;
 }
 
 //-----------------------------------------------------------------------------
@@ -148,7 +148,7 @@ void Solar_viewer::timer()
         //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
         light_.time_step(time_step_);
-        mercury_.time_step(time_step_);
+        bone_.time_step(time_step_);
         update_body_positions();
     }
 }
@@ -175,7 +175,7 @@ void Solar_viewer::initialize()
 
     // Allocate textures
     light_    .tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
-    mercury_.tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+    bone_.tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
 
     // Load/generate textures
     light_    .tex_.loadPNG(TEXTURE_PATH "/sun.png");
@@ -262,9 +262,9 @@ void Solar_viewer::draw_scene(mat4& _projection, mat4& _view)
     light_.tex_.bind();
     unit_sphere_.draw();
 
-    // render mercury
-    mat4 trans_mercury = mat4::translate(vec3(mercury_.pos_));
-    m_matrix = trans_mercury * mat4::rotate_y(mercury_.angle_self_) * mat4::scale(mercury_.radius_);
+    // render bone
+    mat4 trans_mercury = mat4::translate(vec3(bone_.pos_));
+    m_matrix = trans_mercury * mat4::rotate_y(bone_.angle_self_) * mat4::scale(bone_.radius_);
     mv_matrix = _view * m_matrix;
     mvp_matrix = _projection * mv_matrix;
     n_matrix = transpose(inverse(mat3(mv_matrix))); 
@@ -277,7 +277,7 @@ void Solar_viewer::draw_scene(mat4& _projection, mat4& _view)
     phong_shader_.set_uniform("light_position", _view * light_.pos_);
     phong_shader_.set_uniform("tex", 0);
     phong_shader_.set_uniform("greyscale", (int)greyscale_);
-    mercury_.tex_.bind();
+    bone_.tex_.bind();
     unit_sphere_.draw();
 
     glDisable(GL_BLEND);

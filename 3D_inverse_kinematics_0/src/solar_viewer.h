@@ -72,8 +72,8 @@ private:
 
     /// the light object
     Planet light_;
-    /// the mercury object
-    Planet mercury_;
+    /// the bone object
+    Planet bone_;
 
     /// default color shader (renders only texture)
     Shader   color_shader_;
