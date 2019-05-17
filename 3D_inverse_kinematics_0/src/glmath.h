@@ -72,6 +72,14 @@ public:
             float g; ///< green component
             float b; ///< blue component
         };
+
+        /// rotation components
+        struct
+        {
+            float pitch; ///< pitch component
+            float yaw; ///< yaw component
+            float roll; ///< roll component
+        };
     };
 
 
