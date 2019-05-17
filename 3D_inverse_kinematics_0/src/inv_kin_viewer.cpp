@@ -23,7 +23,7 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
       
       //         origin                        orientation             scale (height)
       light_    (vec4(0.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 1.0f),
-      bone_     (vec4(2.0f, 0.0f, 0.0f, 1.0f), 0.5f, vec4(0.0f, 1.0f, 0.0f, 0.0f))
+      bone_     (vec4(2.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f, 1.0f)
 {
     // start animation
     timer_active_ = true;

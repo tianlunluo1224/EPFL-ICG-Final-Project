@@ -19,6 +19,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "hinge.h"
+#include "bone.h"
 #include "path.h"
 #include "frame.h"
 #include "bezier.h"
@@ -76,7 +77,7 @@ private:
     /// the light object
     Hinge light_;
     /// the bone object
-    Hinge bone_;
+    Bone bone_;
 
     /// default color shader (renders only texture)
     Shader   color_shader_;
