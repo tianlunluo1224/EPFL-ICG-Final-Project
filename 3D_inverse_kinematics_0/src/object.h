@@ -34,6 +34,12 @@ public:
         // angle_self_  = fmod(angle_self_  + _days * angle_step_self_,  360.0);
     }
 
+    virtual void update_dof(std::vector<float> values)
+    {}
+
+    virtual void update_position(const vec4 _prev_endpoint, const vec4 _prev_orientation)
+    {}
+
     /// the current position of the object
     vec4 origin_;
 
