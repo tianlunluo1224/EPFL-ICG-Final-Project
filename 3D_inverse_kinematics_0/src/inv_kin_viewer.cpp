@@ -21,9 +21,9 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
       unit_sphere_(50), //level of tesselation
       unit_cylinder_(50), //level of tesselation
       
-      //       orbit period     self-rotation       radius   distance
-      light_    (0.0f,            360.f/26.0f,        1.0f,    0.0f),
-      bone_(360.f/116.0f,    360.f/58.5f,        0.075f, -1.4f)
+      //       origin     scale       rot_axis
+      light_    (vec4(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, vec4(0.0f, 1.0f, 0.0f, 0.0f)),
+      bone_     (vec4(2.0f, 0.0f, 0.0f, 1.0f), 0.5f, vec4(0.0f, 1.0f, 0.0f, 0.0f))
 {
     // start animation
     timer_active_ = true;
@@ -135,8 +135,8 @@ keyboard(int key, int scancode, int action, int mods)
 // (see Inv_kin_viewer::paint)
 void Inv_kin_viewer::update_body_positions() {
     
-    vec4 bone_initial(bone_.distance_, 0, 0, 1);
-    bone_.pos_ = mat4::rotate_y(bone_.angle_orbit_) * bone_initial;
+    // vec4 bone_initial(bone_.distance_, 0, 0, 1);
+    // bone_.origin_ = mat4::rotate_y(bone_.angle_orbit_) * bone_initial;
 }
 
 //-----------------------------------------------------------------------------
@@ -198,13 +198,13 @@ void Inv_kin_viewer::paint()
     mat4 view; 
     vec4 eye_pos;
 
-    eye_pos = object_to_look_at_->pos_;
+    eye_pos = object_to_look_at_->origin_;
 
     // Initally, offset the eye_pos from the center of the planet, will
     // be updated by x_angle_ and y_angle_.
-    eye_pos[2] = eye_pos[2] + (dist_factor_ * object_to_look_at_->radius_);
+    eye_pos[2] = eye_pos[2] + (dist_factor_ * object_to_look_at_->scale_);
 
-    vec4  center = object_to_look_at_->pos_;
+    vec4  center = object_to_look_at_->origin_;
     vec4      up = vec4(0,1,0,0);
 
     mat4 inv_trans = mat4::translate(-vec3(center));
@@ -248,7 +248,7 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     if (timer_active_) sun_animation_time += 0.01f;
 
     // render sun
-    m_matrix = mat4::rotate_y(light_.angle_self_) * mat4::scale(light_.radius_);
+    m_matrix = mat4::rotate_y(0.0f) * mat4::scale(light_.scale_);
     mv_matrix = _view * m_matrix;
     mvp_matrix = _projection * mv_matrix;
     phong_shader_.use();
@@ -258,14 +258,14 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     phong_shader_.set_uniform("t", sun_animation_time, true /* Indicate that time parameter is optional;
                                                              it may be optimized away by the GLSL    compiler if it's unused. */);
     phong_shader_.set_uniform("tex", 0);
-    phong_shader_.set_uniform("light_position", _view * light_.pos_);
+    phong_shader_.set_uniform("light_position", _view * light_.origin_);
     phong_shader_.set_uniform("greyscale", (int)greyscale_);
     light_.tex_.bind();
     unit_sphere_.draw();
 
     // render bone
-    mat4 trans_mercury = mat4::translate(vec3(bone_.pos_));
-    m_matrix = trans_mercury * mat4::rotate_y(bone_.angle_self_) * mat4::scale(bone_.radius_);
+    mat4 trans_mercury = mat4::translate(vec3(bone_.origin_));
+    m_matrix = trans_mercury * mat4::rotate_y(0.0f) * mat4::scale(bone_.scale_);
     mv_matrix = _view * m_matrix;
     mvp_matrix = _projection * mv_matrix;
     n_matrix = transpose(inverse(mat3(mv_matrix))); 
@@ -275,7 +275,7 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     phong_shader_.set_uniform("normal_matrix", n_matrix);
     phong_shader_.set_uniform("t", sun_animation_time, true /* Indicate that time parameter is optional;
                                                              it may be optimized away by the GLSL    compiler if it's unused. */);
-    phong_shader_.set_uniform("light_position", _view * light_.pos_);
+    phong_shader_.set_uniform("light_position", _view * light_.origin_);
     phong_shader_.set_uniform("tex", 0);
     phong_shader_.set_uniform("greyscale", (int)greyscale_);
     bone_.tex_.bind();
