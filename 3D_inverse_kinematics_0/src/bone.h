@@ -23,10 +23,10 @@ public:
 public:
     /// default constructor
     Bone(const vec4 _base,
-           const vec3 _orientation,
+           const vec3 _base_orientation,
            const float _scale,
            const float _height) :
-        Object(_base, _orientation, _scale),
+        Object(_base, _base_orientation, _scale),
         height_(_height)
     {}
 
