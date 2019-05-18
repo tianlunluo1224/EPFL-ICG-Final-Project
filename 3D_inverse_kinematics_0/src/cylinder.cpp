@@ -15,10 +15,9 @@
 //=============================================================================
 
 
-Cylinder::Cylinder(unsigned int resolution)
-    : resolution_(resolution)
-{
-}
+Cylinder::Cylinder(unsigned int resolution) :
+    resolution_(resolution)
+{}
 
 
 //-----------------------------------------------------------------------------

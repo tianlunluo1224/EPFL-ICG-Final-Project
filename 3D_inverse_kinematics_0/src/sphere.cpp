@@ -15,10 +15,9 @@
 //=============================================================================
 
 
-Sphere::Sphere(unsigned int resolution)
-    : resolution_(resolution)
-{
-}
+Sphere::Sphere(unsigned int resolution) :
+    resolution_(resolution)
+{}
 
 
 //-----------------------------------------------------------------------------

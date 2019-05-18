@@ -11,11 +11,12 @@
 //=============================================================================
 
 #include "gl.h"
+#include "mesh.h"
 
 //=============================================================================
 
 /// class that creates a sphere with a desired tessellation degree and renders it
-class Cylinder
+class Cylinder : public Mesh
 {
 public:
 

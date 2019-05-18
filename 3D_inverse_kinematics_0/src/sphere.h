@@ -11,11 +11,12 @@
 //=============================================================================
 
 #include "gl.h"
+#include "mesh.h"
 
 //=============================================================================
 
 /// class that creates a sphere with a desired tessellation degree and renders it
-class Sphere
+class Sphere: public Mesh
 {
 public:
 
@@ -58,7 +59,6 @@ private:
     /// index buffer object
     GLuint ibo_ = 0;
 };
-
 
 //=============================================================================
 #endif
