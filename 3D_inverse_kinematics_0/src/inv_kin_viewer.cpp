@@ -168,7 +168,7 @@ void Inv_kin_viewer::resize(int _width, int _height)
 void Inv_kin_viewer::initialize()
 {
     // set initial state
-    glClearColor(1,1,1,0);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glEnable(GL_DEPTH_TEST);
 
     // Allocate textures
