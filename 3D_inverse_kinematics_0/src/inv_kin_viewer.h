@@ -17,6 +17,7 @@
 #include "texture.h"
 #include "object/hinge.h"
 #include "object/bone.h"
+#include "object/light.h"
 #include "path.h"
 #include "frame.h"
 #include "bezier.h"
@@ -74,7 +75,7 @@ private:
     Cylinder unit_cylinder_;
 
     /// the light object
-    Object light_;
+    Light light_;
 
     /// the list which contains all objects in the scene
     std::vector<Object*> object_list_;

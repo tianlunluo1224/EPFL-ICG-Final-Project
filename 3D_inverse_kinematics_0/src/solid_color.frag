@@ -9,9 +9,9 @@
 
 #version 140
 
-uniform vec4 color;
+uniform vec3 color;
 out vec4 f_color;
 
 void main() {
-    f_color = color;
+    f_color = vec4(color, 1.0);
 }
