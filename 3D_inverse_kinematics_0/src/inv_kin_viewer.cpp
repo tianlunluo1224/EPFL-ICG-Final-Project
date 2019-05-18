@@ -180,6 +180,16 @@ void Inv_kin_viewer::initialize()
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glEnable(GL_DEPTH_TEST);
 
+    // setup shaders
+    color_shader_.load(SHADER_PATH "/color.vert", SHADER_PATH "/color.frag");
+    phong_shader_.load(SHADER_PATH "/phong.vert", SHADER_PATH "/phong.frag");
+    solid_color_shader_.load(SHADER_PATH "/solid_color.vert", SHADER_PATH "/solid_color.frag");
+
+    // bind shaders
+    light_.shader_ = phong_shader_;
+    bone_.shader_ = phong_shader_;
+    hinge_.shader_ = phong_shader_;
+
     // bind meshes
     light_.mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);
     bone_.mesh_ = dynamic_cast<Mesh*>(&unit_cylinder_);
@@ -194,12 +204,6 @@ void Inv_kin_viewer::initialize()
     light_.tex_.loadPNG(TEXTURE_PATH "/sun.png");
     bone_ .tex_.loadPNG(TEXTURE_PATH "/day.png");
     hinge_.tex_.loadPNG(TEXTURE_PATH "/mercury.png");
-
-    // setup shaders
-    color_shader_.load(SHADER_PATH "/color.vert", SHADER_PATH "/color.frag");
-    phong_shader_.load(SHADER_PATH "/phong.vert", SHADER_PATH "/phong.frag");
-
-    solid_color_shader_.load(SHADER_PATH "/solid_color.vert", SHADER_PATH "/solid_color.frag");
 }
 //-----------------------------------------------------------------------------
 
@@ -276,7 +280,7 @@ enum OBJ_TYPE {OBJECT, BONE, HINGE};
 void Inv_kin_viewer::draw_objects(mat4& _projection, mat4& _view)
 {
     for (Object* object: object_list_) {
-        object->draw(phong_shader_, _projection, _view, light_, greyscale_);
+        object->draw(_projection, _view, light_, greyscale_);
     }
 }
 
