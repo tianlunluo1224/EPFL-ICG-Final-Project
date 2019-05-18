@@ -222,6 +222,8 @@ void Inv_kin_viewer::initialize()
         }
     }
 
+    // Remove the light object since we don't need to animate it.
+    object_list_.erase(object_list_.begin());
 }
 //-----------------------------------------------------------------------------
 
@@ -282,6 +284,8 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     static float sun_animation_time = 0;
     if (timer_active_) sun_animation_time += 0.01f;
 
+    light_.draw(_projection, _view, light_, greyscale_);
+    
     draw_objects(_projection, _view);
 
     glDisable(GL_BLEND);
