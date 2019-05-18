@@ -19,8 +19,9 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
       unit_cylinder_(50), //level of tesselation
       
       //         origin                        orientation             scale (height)
-      light_    (vec4(0.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 1.0f),
-      bone_     (vec4(2.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f, 2.0f)
+      light_    (vec4(0.0f, 1.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f),
+      bone_     (vec4(2.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f, 2.0f),
+      hinge_    (vec4(0.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f)
 {
     // start animation
     timer_active_ = true;
@@ -33,7 +34,7 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
     far_  = 20;
 
     // initial viewing setup
-    object_to_look_at_ = &light_;
+    object_to_look_at_ = &hinge_;
     x_angle_ = 0.0f;
     y_angle_ = 0.0f;
     dist_factor_ = 4.5f;
@@ -171,12 +172,14 @@ void Inv_kin_viewer::initialize()
     glEnable(GL_DEPTH_TEST);
 
     // Allocate textures
-    light_    .tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
-    bone_.tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+    light_.tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+    bone_ .tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+    hinge_.tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
 
     // Load/generate textures
-    light_    .tex_.loadPNG(TEXTURE_PATH "/sun.png");
-    bone_    .tex_.loadPNG(TEXTURE_PATH "/day.png");
+    light_.tex_.loadPNG(TEXTURE_PATH "/sun.png");
+    bone_ .tex_.loadPNG(TEXTURE_PATH "/day.png");
+    hinge_.tex_.loadPNG(TEXTURE_PATH "/mercury.png");
 
     // setup shaders
     color_shader_.load(SHADER_PATH "/color.vert", SHADER_PATH "/color.frag");
@@ -237,16 +240,15 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     mat4 mvp_matrix;
     mat3 n_matrix;
 
-    // the sun is centered at the origin and -- for lighting -- considered to be a point, so that is the light position in world coordinates
-    vec4 light = vec4(0.0, 0.0, 0.0, 1.0); //in world coordinates
     // convert light into camera coordinates
-    light = _view * light;
+    vec4 light = _view * light_.base_;
 
     static float sun_animation_time = 0;
     if (timer_active_) sun_animation_time += 0.01f;
 
     draw_object(_projection, _view, light_);
     draw_object(_projection, _view, bone_);
+    draw_object(_projection, _view, hinge_);
 
     glDisable(GL_BLEND);
 
@@ -272,10 +274,13 @@ void Inv_kin_viewer::draw_object(mat4& _projection, mat4& _view, Object& _obj)
 
     // the matrices we need: model, modelview, modelview-projection, normal
     mat4 scaling;
-    if (obj_type == BONE) {
-        scaling = mat4::scale(_obj.scale_, 0.2f * _obj.scale_, dynamic_cast<Bone*>(&_obj)->height_);
-    } else {
-        scaling = mat4::scale(_obj.scale_);
+    switch (obj_type) {
+        case BONE:
+            scaling = mat4::scale(_obj.scale_, 0.2f * _obj.scale_, dynamic_cast<Bone*>(&_obj)->height_);
+            break;
+        default:
+            scaling = mat4::scale(_obj.scale_);
+            break;
     }
     mat4 translation = mat4::translate(vec3(_obj.base_));
     mat4 self_rotation = mat4::rotate_y(_obj.base_orientation_.yaw) * mat4::rotate_x(_obj.base_orientation_.pitch) * mat4::rotate_z(_obj.base_orientation_.roll);
@@ -295,12 +300,21 @@ void Inv_kin_viewer::draw_object(mat4& _projection, mat4& _view, Object& _obj)
     phong_shader_.set_uniform("tex", 0);
     phong_shader_.set_uniform("greyscale", (int)greyscale_);
     
-    if (obj_type == BONE) {
-        bone_.tex_.bind();
-        unit_cylinder_.draw();
-    } else {
-        light_.tex_.bind();
-        unit_sphere_.draw();
+    switch (obj_type) {
+        case OBJECT:
+            light_.tex_.bind();
+            unit_sphere_.draw();
+            break;
+        case BONE:
+            bone_.tex_.bind();
+            unit_cylinder_.draw();
+            break;
+        case HINGE:
+            hinge_.tex_.bind();
+            unit_sphere_.draw();
+            break;
+        default:
+            break;
     }
 }
 

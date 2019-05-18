@@ -77,10 +77,12 @@ private:
     Cylinder unit_cylinder_;
 
     /// the light object
-    Hinge light_;
+    Object light_;
     /// the bone object
     Bone bone_;
-
+    /// the hinge object
+    Hinge hinge_;
+    
     /// default color shader (renders only texture)
     Shader   color_shader_;
     /// phong shader (renders texture and basic illumination)
@@ -108,7 +110,7 @@ private:
     float far_;
 
     /// which object are we looking at (control with key 1-6)
-    const Hinge* object_to_look_at_;
+    const Object* object_to_look_at_;
 
     /// rotation in x direction around the planet/sun from the original point
     float x_angle_;
