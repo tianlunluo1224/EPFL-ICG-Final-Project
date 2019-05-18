@@ -26,7 +26,7 @@ public:
            const vec3 _base_orientation,
            const float _scale,
            const float _height) :
-        Object(_base, _base_orientation, _scale),
+        Object(_base, _base_orientation, _scale, BONE),
         height_(_height)
     {}
 

@@ -73,14 +73,11 @@ private:
     /// cylinder object
     Cylinder unit_cylinder_;
 
-    std::vector<Object*> object_list_;
-
     /// the light object
     Object light_;
-    /// the bone object
-    Bone bone_;
-    /// the hinge object
-    Hinge hinge_;
+
+    /// the list which contains all objects in the scene
+    std::vector<Object*> object_list_;
     
     /// default color shader (renders only texture)
     Shader   color_shader_;

@@ -24,7 +24,7 @@ public:
     Hinge(const vec4 _base,
            const vec3 _base_orientation,
            const float _scale) :
-        Object(_base, _base_orientation, _scale),
+        Object(_base, _base_orientation, _scale, HINGE),
         rot_angle_(0.0f)
     {}
 

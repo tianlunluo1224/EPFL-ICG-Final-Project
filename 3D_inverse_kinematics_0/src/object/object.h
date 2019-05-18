@@ -20,6 +20,9 @@ enum object_type_t {OBJECT, BONE, HINGE};
 class Object
 {
 public:
+    /// the object type
+    object_type_t object_type_;
+
     /// the current position of the object's base
     vec4 base_;
 
@@ -41,10 +44,12 @@ public:
     /// default constructor
     Object(const vec4 _base,
            const vec3 _base_orientation,
-           const float _scale) :
+           const float _scale,
+           const object_type_t _object_type = OBJECT) :
         base_(_base),
         base_orientation_(_base_orientation),
-        scale_(_scale)
+        scale_(_scale),
+        object_type_(_object_type)
     {}
 
     /// set the time for every update

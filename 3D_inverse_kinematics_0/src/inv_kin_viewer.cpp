@@ -18,15 +18,19 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
     : GLFW_window(_title, _width, _height),
       
       //         origin                        orientation             scale (height)
-      light_    (vec4(0.0f, 1.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f),
-      bone_     (vec4(2.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f, 2.0f),
-      hinge_    (vec4(0.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f)
+      light_    (vec4(0.0f, 1.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f)
 {
+
+    // Bones
+    Bone* bone = new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f, 2.0f);
+    
+    // Hinges
+    Hinge* hinge = new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f);
 
     object_list_ = std::vector<Object*>();
     object_list_.push_back(&light_);
-    object_list_.push_back(&bone_);
-    object_list_.push_back(&hinge_);
+    object_list_.push_back(bone);
+    object_list_.push_back(hinge);
 
 
     // start animation
@@ -40,7 +44,7 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
     far_  = 20;
 
     // initial viewing setup
-    object_to_look_at_ = &hinge_;
+    object_to_look_at_ = hinge;
     x_angle_ = 0.0f;
     y_angle_ = 0.0f;
     dist_factor_ = 4.5f;
@@ -138,8 +142,19 @@ keyboard(int key, int scancode, int action, int mods)
 // around their orbits. This position is needed to set up the camera in the scene
 // (see Inv_kin_viewer::paint)
 void Inv_kin_viewer::update_body_positions() {
-    light_.base_orientation_.yaw += 0.1f;
-    bone_.base_orientation_.pitch += 0.5f;
+    for (Object* object: object_list_) {
+        switch(object->object_type_) {
+            case OBJECT:
+                object->base_orientation_.yaw += 0.1f;
+                break;
+            case BONE:
+                object->base_orientation_.pitch += 0.3f;
+                break;
+            case HINGE:
+                object->base_orientation_.roll += 0.5f;
+                break;
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -151,8 +166,8 @@ void Inv_kin_viewer::timer()
         universe_time_ += time_step_;
         //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
-        light_.time_step(time_step_);
-        bone_.time_step(time_step_);
+        // light_.time_step(time_step_);
+        // bone_.time_step(time_step_);
         update_body_positions();
     }
 }
@@ -184,25 +199,29 @@ void Inv_kin_viewer::initialize()
     phong_shader_.load(SHADER_PATH "/phong.vert", SHADER_PATH "/phong.frag");
     solid_color_shader_.load(SHADER_PATH "/solid_color.vert", SHADER_PATH "/solid_color.frag");
 
-    // bind shaders
-    light_.shader_ = phong_shader_;
-    bone_.shader_ = phong_shader_;
-    hinge_.shader_ = phong_shader_;
+    for (Object* object: object_list_) {
+        object->shader_ = phong_shader_;
+        object->tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
 
-    // bind meshes
-    light_.mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);
-    bone_.mesh_ = dynamic_cast<Mesh*>(&unit_cylinder_);
-    hinge_.mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);
+        switch(object->object_type_) {
+            case OBJECT:
+                object->mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);
+                object->tex_.loadPNG(TEXTURE_PATH "/sun.png");
+                break;
+            case BONE:
+                object->mesh_ = dynamic_cast<Mesh*>(&unit_cylinder_);
+                object->tex_.loadPNG(TEXTURE_PATH "/day.png");
+                break;
+            case HINGE:
+                object->mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);
+                object->tex_.loadPNG(TEXTURE_PATH "/mercury.png");
+                break;
+            default:
+                assert(false);
+                break;
+        }
+    }
 
-    // Allocate textures
-    light_.tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
-    bone_ .tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
-    hinge_.tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
-
-    // Load/generate textures
-    light_.tex_.loadPNG(TEXTURE_PATH "/sun.png");
-    bone_ .tex_.loadPNG(TEXTURE_PATH "/day.png");
-    hinge_.tex_.loadPNG(TEXTURE_PATH "/mercury.png");
 }
 //-----------------------------------------------------------------------------
 
