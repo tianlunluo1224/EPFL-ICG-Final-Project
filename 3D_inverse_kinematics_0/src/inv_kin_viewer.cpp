@@ -245,45 +245,64 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     static float sun_animation_time = 0;
     if (timer_active_) sun_animation_time += 0.01f;
 
-    // render light
-    m_matrix = mat4::rotate_y(light_.base_orientation_.yaw) * mat4::scale(light_.scale_);
-    mv_matrix = _view * m_matrix;
-    mvp_matrix = _projection * mv_matrix;
-    phong_shader_.use();
-    phong_shader_.set_uniform("modelview_projection_matrix", mvp_matrix);
-    phong_shader_.set_uniform("modelview_matrix", mv_matrix);
-    phong_shader_.set_uniform("normal_matrix", n_matrix);
-    phong_shader_.set_uniform("t", sun_animation_time, true /* Indicate that time parameter is optional;
-                                                             it may be optimized away by the GLSL    compiler if it's unused. */);
-    phong_shader_.set_uniform("tex", 0);
-    phong_shader_.set_uniform("light_position", _view * light_.base_);
-    phong_shader_.set_uniform("greyscale", (int)greyscale_);
-    light_.tex_.bind();
-    unit_sphere_.draw();
-
-    // render bone
-    mat4 trans_bone = mat4::translate(vec3(bone_.base_));
-    obj_rot_matrix = mat4::rotate_y(bone_.base_orientation_.yaw) * mat4::rotate_x(bone_.base_orientation_.pitch) * mat4::rotate_z(bone_.base_orientation_.roll);
-    m_matrix = trans_bone * obj_rot_matrix * mat4::scale(bone_.scale_, 0.2 * bone_.scale_, bone_.height_);
-    mv_matrix = _view * m_matrix;
-    mvp_matrix = _projection * mv_matrix;
-    n_matrix = transpose(inverse(mat3(mv_matrix))); 
-    phong_shader_.use();
-    phong_shader_.set_uniform("modelview_projection_matrix", mvp_matrix);
-    phong_shader_.set_uniform("modelview_matrix", mv_matrix);
-    phong_shader_.set_uniform("normal_matrix", n_matrix);
-    phong_shader_.set_uniform("t", sun_animation_time, true /* Indicate that time parameter is optional;
-                                                             it may be optimized away by the GLSL    compiler if it's unused. */);
-    phong_shader_.set_uniform("light_position", _view * light_.base_);
-    phong_shader_.set_uniform("tex", 0);
-    phong_shader_.set_uniform("greyscale", (int)greyscale_);
-    bone_.tex_.bind();
-    unit_cylinder_.draw();
+    draw_object(_projection, _view, light_);
+    draw_object(_projection, _view, bone_);
 
     glDisable(GL_BLEND);
 
     // check for OpenGL errors
     glCheckError();
 }
+
+
+//-----------------------------------------------------------------------------
+
+enum OBJ_TYPE {OBJECT, BONE, HINGE};
+
+
+void Inv_kin_viewer::draw_object(mat4& _projection, mat4& _view, Object& _obj)
+{
+    enum OBJ_TYPE obj_type = OBJECT;
+
+    if (dynamic_cast<Bone*>(&_obj)) {
+        obj_type = BONE;
+    } else if (dynamic_cast<Hinge*>(&_obj)) {
+        obj_type = HINGE;
+    }
+
+    // the matrices we need: model, modelview, modelview-projection, normal
+    mat4 scaling;
+    if (obj_type == BONE) {
+        scaling = mat4::scale(_obj.scale_, 0.2f * _obj.scale_, dynamic_cast<Bone*>(&_obj)->height_);
+    } else {
+        scaling = mat4::scale(_obj.scale_);
+    }
+    mat4 translation = mat4::translate(vec3(_obj.base_));
+    mat4 self_rotation = mat4::rotate_y(_obj.base_orientation_.yaw) * mat4::rotate_x(_obj.base_orientation_.pitch) * mat4::rotate_z(_obj.base_orientation_.roll);
+    
+    mat4 m_matrix = translation * self_rotation * scaling;
+    mat4 mv_matrix = _view * m_matrix;
+    mat4 mvp_matrix = _projection * mv_matrix;
+    mat3 n_matrix = transpose(inverse(mat3(mv_matrix)));
+
+    phong_shader_.use();
+    phong_shader_.set_uniform("modelview_projection_matrix", mvp_matrix);
+    phong_shader_.set_uniform("modelview_matrix", mv_matrix);
+    phong_shader_.set_uniform("normal_matrix", n_matrix);
+    phong_shader_.set_uniform("t", 0.0f, true /* Indicate that time parameter is optional;
+                                                             it may be optimized away by the GLSL    compiler if it's unused. */);
+    phong_shader_.set_uniform("light_position", _view * light_.base_);
+    phong_shader_.set_uniform("tex", 0);
+    phong_shader_.set_uniform("greyscale", (int)greyscale_);
+    
+    if (obj_type == BONE) {
+        bone_.tex_.bind();
+        unit_cylinder_.draw();
+    } else {
+        light_.tex_.bind();
+        unit_sphere_.draw();
+    }
+}
+
 
 //=============================================================================
