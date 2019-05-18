@@ -8,7 +8,7 @@
 //=============================================================================
 
 #include "texture.h"
-#include "mesh.h"
+#include "mesh/mesh.h"
 #include "shader.h"
 #include "glmath.h"
 

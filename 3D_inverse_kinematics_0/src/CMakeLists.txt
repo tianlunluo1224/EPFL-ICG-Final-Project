@@ -4,7 +4,11 @@ ADD_DEFINITIONS(-DGLEW_STATIC)
 
 # source files
 file(GLOB SOURCES ./*.cpp)
+file(GLOB SOURCES_OBJECT ./object/*.cpp)
+file(GLOB SOURCES_MESH ./mesh/*.cpp)
 file(GLOB HEADERS ./*.h)
+file(GLOB HEADERS_OBJECT ./object/*.h)
+file(GLOB HEADERS_MESH ./mesh/*.h)
 file(GLOB SHADERS ./*.vert ./*.frag)
 
 # Make sure the textures and shaders are available
@@ -14,7 +18,7 @@ add_definitions("-DTEXTURE_PATH=\"${TEXTURE_PATH}\"")
 add_definitions("-DSHADER_PATH=\"${SHADER_PATH}\"")
 
 # executable
-add_executable(InverseKinematics ${HEADERS} ${SOURCES})
+add_executable(InverseKinematics ${HEADERS} ${HEADERS_OBJECT} ${HEADERS_MESH} ${SOURCES} ${SOURCES_OBJECT} ${SOURCES_MESH})
 target_include_directories(InverseKinematics SYSTEM PUBLIC ${GLEW_INCLUDE_DIRS})
 # Note: target_link_libraries(glfw) should actually bring in the necessary header files.
 target_link_libraries(InverseKinematics lodePNG glfw ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES})

@@ -11,12 +11,12 @@
 #include "gl.h"
 #include "glfw_window.h"
 
-#include "sphere.h"
-#include "cylinder.h"
+#include "mesh/sphere.h"
+#include "mesh/cylinder.h"
 #include "shader.h"
 #include "texture.h"
-#include "hinge.h"
-#include "bone.h"
+#include "object/hinge.h"
+#include "object/bone.h"
 #include "path.h"
 #include "frame.h"
 #include "bezier.h"
@@ -72,6 +72,8 @@ private:
 
     /// cylinder object
     Cylinder unit_cylinder_;
+
+    std::vector<Object> object_list_;
 
     /// the light object
     Object light_;

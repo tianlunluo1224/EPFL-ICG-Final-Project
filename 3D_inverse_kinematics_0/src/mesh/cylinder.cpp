@@ -1,10 +1,13 @@
 //=============================================================================
 //
-// Documentation here
+//   Exercise code for the lecture "Introduction to Computer Graphics"
+//     by Prof. Mario Botsch, Bielefeld University
+//
+//   Copyright (C) by Computer Graphics Group, Bielefeld University
 //
 //=============================================================================
 
-#include "sphere.h"
+#include "mesh/cylinder.h"
 #include "glmath.h"
 #include <vector>
 #include <math.h>
@@ -12,7 +15,7 @@
 //=============================================================================
 
 
-Sphere::Sphere(unsigned int resolution) :
+Cylinder::Cylinder(unsigned int resolution) :
     resolution_(resolution)
 {}
 
@@ -20,7 +23,7 @@ Sphere::Sphere(unsigned int resolution) :
 //-----------------------------------------------------------------------------
 
 
-Sphere::~Sphere()
+Cylinder::~Cylinder()
 {
     if (vbo_)  glDeleteBuffers(1, &vbo_);
     if (nbo_)  glDeleteBuffers(1, &nbo_);
@@ -35,10 +38,10 @@ Sphere::~Sphere()
 //-----------------------------------------------------------------------------
 
 
-void Sphere::initialize()
+void Cylinder::initialize()
 {
-    const unsigned int v_resolution =     resolution_;
-    const unsigned int u_resolution = 2 * resolution_;
+    const unsigned int v_resolution =     2;
+    const unsigned int u_resolution = resolution_;
     const unsigned int n_vertices   = (v_resolution) * u_resolution;
     const unsigned int n_triangles  = 2 * (v_resolution-1) * (u_resolution-1);
 
@@ -58,11 +61,11 @@ void Sphere::initialize()
             float v = (float) iv / (float) (v_resolution - 1);
 
             float theta = u * 2.0f * (float) M_PI;
-            float phi   = v * (float) M_PI;
+            float h     = v;
 
-            float x = cos(theta) * sin(phi);
-            float y = sin(theta) * sin(phi);
-            float z =              cos(phi);
+            float x = cos(theta);
+            float y = sin(theta);
+            float z = h;
 
             positions[p++] = x;
             positions[p++] = y;
@@ -136,7 +139,7 @@ void Sphere::initialize()
 //-----------------------------------------------------------------------------
 
 
-void Sphere::draw(GLenum mode)
+void Cylinder::draw(GLenum mode)
 {
     if (n_indices_ == 0) initialize();
 
