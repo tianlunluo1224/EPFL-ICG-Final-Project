@@ -5,6 +5,7 @@
 //=============================================================================
 
 #include "Inv_kin_viewer.h"
+#include "object/object.h"
 #include "glmath.h"
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
@@ -21,6 +22,13 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
       bone_     (vec4(2.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f, 2.0f),
       hinge_    (vec4(0.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f)
 {
+
+    object_list_ = std::vector<Object*>();
+    object_list_.push_back(&light_);
+    object_list_.push_back(&bone_);
+    object_list_.push_back(&hinge_);
+
+
     // start animation
     timer_active_ = true;
     time_step_ = 1.0f/24.0f; // one hour
@@ -267,9 +275,9 @@ enum OBJ_TYPE {OBJECT, BONE, HINGE};
 
 void Inv_kin_viewer::draw_objects(mat4& _projection, mat4& _view)
 {
-    light_.draw(phong_shader_, _projection, _view, light_, greyscale_);
-    bone_.draw(phong_shader_, _projection, _view, light_, greyscale_);
-    hinge_.draw(phong_shader_, _projection, _view, light_, greyscale_);
+    for (Object* object: object_list_) {
+        object->draw(phong_shader_, _projection, _view, light_, greyscale_);
+    }
 }
 
 

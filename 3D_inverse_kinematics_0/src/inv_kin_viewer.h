@@ -73,7 +73,7 @@ private:
     /// cylinder object
     Cylinder unit_cylinder_;
 
-    std::vector<Object> object_list_;
+    std::vector<Object*> object_list_;
 
     /// the light object
     Object light_;
