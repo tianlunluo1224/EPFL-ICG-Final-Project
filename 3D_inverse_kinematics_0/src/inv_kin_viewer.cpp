@@ -15,8 +15,6 @@
 
 Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
     : GLFW_window(_title, _width, _height),
-      unit_sphere_(50), //level of tesselation
-      unit_cylinder_(50), //level of tesselation
       
       //         origin                        orientation             scale (height)
       light_    (vec4(0.0f, 1.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f),
@@ -167,9 +165,17 @@ void Inv_kin_viewer::resize(int _width, int _height)
 
 void Inv_kin_viewer::initialize()
 {
+    unit_sphere_ = Sphere(50);
+    unit_cylinder_ = Cylinder(50);
+
     // set initial state
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glEnable(GL_DEPTH_TEST);
+
+    // bind meshes
+    light_.mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);
+    bone_.mesh_ = dynamic_cast<Mesh*>(&unit_cylinder_);
+    hinge_.mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);
 
     // Allocate textures
     light_.tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
@@ -246,9 +252,7 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     static float sun_animation_time = 0;
     if (timer_active_) sun_animation_time += 0.01f;
 
-    draw_object(_projection, _view, light_);
-    draw_object(_projection, _view, bone_);
-    draw_object(_projection, _view, hinge_);
+    draw_objects(_projection, _view);
 
     glDisable(GL_BLEND);
 
@@ -261,61 +265,11 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
 
 enum OBJ_TYPE {OBJECT, BONE, HINGE};
 
-
-void Inv_kin_viewer::draw_object(mat4& _projection, mat4& _view, Object& _obj)
+void Inv_kin_viewer::draw_objects(mat4& _projection, mat4& _view)
 {
-    enum OBJ_TYPE obj_type = OBJECT;
-
-    if (dynamic_cast<Bone*>(&_obj)) {
-        obj_type = BONE;
-    } else if (dynamic_cast<Hinge*>(&_obj)) {
-        obj_type = HINGE;
-    }
-
-    // the matrices we need: model, modelview, modelview-projection, normal
-    mat4 scaling;
-    switch (obj_type) {
-        case BONE:
-            scaling = mat4::scale(_obj.scale_, 0.2f * _obj.scale_, dynamic_cast<Bone*>(&_obj)->height_);
-            break;
-        default:
-            scaling = mat4::scale(_obj.scale_);
-            break;
-    }
-    mat4 translation = mat4::translate(vec3(_obj.base_));
-    mat4 self_rotation = mat4::rotate_y(_obj.base_orientation_.yaw) * mat4::rotate_x(_obj.base_orientation_.pitch) * mat4::rotate_z(_obj.base_orientation_.roll);
-    
-    mat4 m_matrix = translation * self_rotation * scaling;
-    mat4 mv_matrix = _view * m_matrix;
-    mat4 mvp_matrix = _projection * mv_matrix;
-    mat3 n_matrix = transpose(inverse(mat3(mv_matrix)));
-
-    phong_shader_.use();
-    phong_shader_.set_uniform("modelview_projection_matrix", mvp_matrix);
-    phong_shader_.set_uniform("modelview_matrix", mv_matrix);
-    phong_shader_.set_uniform("normal_matrix", n_matrix);
-    phong_shader_.set_uniform("t", 0.0f, true /* Indicate that time parameter is optional;
-                                                             it may be optimized away by the GLSL    compiler if it's unused. */);
-    phong_shader_.set_uniform("light_position", _view * light_.base_);
-    phong_shader_.set_uniform("tex", 0);
-    phong_shader_.set_uniform("greyscale", (int)greyscale_);
-    
-    switch (obj_type) {
-        case OBJECT:
-            light_.tex_.bind();
-            unit_sphere_.draw();
-            break;
-        case BONE:
-            bone_.tex_.bind();
-            unit_cylinder_.draw();
-            break;
-        case HINGE:
-            hinge_.tex_.bind();
-            unit_sphere_.draw();
-            break;
-        default:
-            break;
-    }
+    light_.draw(phong_shader_, _projection, _view, light_, greyscale_);
+    bone_.draw(phong_shader_, _projection, _view, light_, greyscale_);
+    hinge_.draw(phong_shader_, _projection, _view, light_, greyscale_);
 }
 
 

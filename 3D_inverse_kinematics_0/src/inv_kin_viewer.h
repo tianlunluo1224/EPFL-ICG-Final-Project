@@ -60,7 +60,7 @@ protected:
     /// \param _view the view matrix for the scene
     void draw_scene(mat4& _projection, mat4& _view);
 
-    void draw_object(mat4& _projection, mat4& _view, Object& _obj);
+    void draw_objects(mat4& _projection, mat4& _view);
 
     /// update function on every timer event (controls the animation)
     virtual void timer();
