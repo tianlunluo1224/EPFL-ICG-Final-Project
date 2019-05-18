@@ -27,8 +27,7 @@ public:
     vec4 base_;
 
     /// the current orientation of the object
-    /// roll(z), pitch(x), yaw(y)
-    vec3 base_orientation_;
+    mat4 base_orientation_;
 
     /// the scaling factor of the object
     float scale_;
@@ -43,7 +42,7 @@ public:
 public:
     /// default constructor
     Object(const vec4 _base,
-           const vec3 _base_orientation,
+           const mat4 _base_orientation,
            const float _scale,
            const object_type_t _object_type = OBJECT) :
         base_(_base),
@@ -51,6 +50,14 @@ public:
         scale_(_scale),
         object_type_(_object_type)
     {}
+
+    virtual vec4 end_position() {
+        return vec4(base_);
+    }
+
+    virtual mat4 end_orientation() {
+        return mat4(base_orientation_);
+    }
 
     /// set the time for every update
     virtual void time_step(float _time)
@@ -62,17 +69,19 @@ public:
     virtual void update_dof(std::vector<float> values)
     {}
 
-    virtual void update_position(const vec4 _prev_endpoint, const vec3 _prev_orientation)
-    {}
+    virtual void update_position(const vec4 _prev_endpoint, const mat4 _prev_orientation)
+    {
+        base_ = _prev_endpoint;
+        base_orientation_ = _prev_orientation;
+    }
 
     virtual void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)
     {
         // the matrices we need: model, modelview, modelview-projection, normal
         mat4 scaling = scaling = mat4::scale(scale_);
         mat4 translation = mat4::translate(vec3(base_));
-        mat4 self_rotation = mat4::rotate_y(base_orientation_.yaw) * mat4::rotate_x(base_orientation_.pitch) * mat4::rotate_z(base_orientation_.roll);
         
-        mat4 m_matrix = translation * self_rotation * scaling;
+        mat4 m_matrix = translation * base_orientation_ * scaling;
         mat4 mv_matrix = _view * m_matrix;
         mat4 mvp_matrix = _projection * mv_matrix;
         mat3 n_matrix = transpose(inverse(mat3(mv_matrix)));

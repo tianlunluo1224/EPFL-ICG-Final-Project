@@ -68,6 +68,9 @@ protected:
 
 private:
 
+    /// origin of coordinate system
+    vec4 origin_ = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
     /// sphere object
     Sphere unit_sphere_;
 
@@ -76,6 +79,9 @@ private:
 
     /// the light object
     Light light_;
+
+    /// the object the viewer is looking at
+    Light viewer_;
 
     /// the list which contains all objects in the scene
     std::vector<Object*> object_list_;

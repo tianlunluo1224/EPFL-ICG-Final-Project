@@ -14,23 +14,20 @@
 //=============================================================================
 
 
-Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
-    : GLFW_window(_title, _width, _height),
+Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
+    GLFW_window(_title, _width, _height),
       
       //         origin                        orientation             scale (height)
-      light_    (vec4(0.0f, 10.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.1f)
+    light_(vec4(0.0f, 10.0f, 0.0f, 1.0f), mat4::identity(), 0.1f, vec3(1.0f)),
+    viewer_(origin_, mat4::identity(), 0.2f, vec3(0.5f))
 {
-
-    // Bones
-    Bone* bone = new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f, 2.0f);
-    
-    // Hinges
-    Hinge* hinge = new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), 0.5f);
 
     object_list_ = std::vector<Object*>();
     object_list_.push_back(&light_);
-    object_list_.push_back(bone);
-    object_list_.push_back(hinge);
+    object_list_.push_back(&viewer_);
+    object_list_.push_back(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.5f));
+    object_list_.push_back(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.5f, 2.0f));
+    object_list_.push_back(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.5f));
 
 
     // start animation
@@ -44,7 +41,7 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height)
     far_  = 20;
 
     // initial viewing setup
-    object_to_look_at_ = hinge;
+    object_to_look_at_ = dynamic_cast<Object*>(&viewer_);
     x_angle_ = 0.0f;
     y_angle_ = 0.0f;
     dist_factor_ = 4.5f;
@@ -142,20 +139,17 @@ keyboard(int key, int scancode, int action, int mods)
 // around their orbits. This position is needed to set up the camera in the scene
 // (see Inv_kin_viewer::paint)
 void Inv_kin_viewer::update_body_positions() {
+
+    vec4 prev_position = origin_;
+    mat4 prev_orientation = mat4::identity();
+    
     for (Object* object: object_list_) {
-        switch(object->object_type_) {
-            case OBJECT:
-                object->base_orientation_.yaw += 0.1f;
-                break;
-            case BONE:
-                object->base_orientation_.pitch += 0.3f;
-                break;
-            case HINGE:
-                object->base_orientation_.roll += 0.5f;
-                break;
-        }
+        object->update_position(prev_position, prev_orientation);
+        prev_position = object->end_position();
+        prev_orientation = object->end_orientation();
     }
 }
+
 
 //-----------------------------------------------------------------------------
 
@@ -167,7 +161,7 @@ void Inv_kin_viewer::timer()
         //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
         // light_.time_step(time_step_);
-        // bone_.time_step(time_step_);
+        object_list_.at(0)->time_step(time_step_);
         update_body_positions();
     }
 }
@@ -226,7 +220,8 @@ void Inv_kin_viewer::initialize()
         }
     }
 
-    // Remove the light object since we don't need to animate it.
+    // Remove the light and viewer objects since we don't need to animate them.
+    object_list_.erase(object_list_.begin());
     object_list_.erase(object_list_.begin());
 }
 //-----------------------------------------------------------------------------
@@ -244,7 +239,7 @@ void Inv_kin_viewer::paint()
 
     // Initally, offset the eye_pos from the center of the planet, will
     // be updated by x_angle_ and y_angle_.
-    eye_pos[2] = eye_pos[2] + (dist_factor_ * object_to_look_at_->scale_);
+    eye_pos[2] = eye_pos[2] + dist_factor_;
 
     vec4  center = object_to_look_at_->base_;
     vec4      up = vec4(0,1,0,0);
@@ -289,6 +284,7 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     if (timer_active_) sun_animation_time += 0.01f;
 
     light_.draw(_projection, _view, light_, greyscale_);
+    viewer_.draw(_projection, _view, light_, greyscale_);
 
     draw_objects(_projection, _view);
 

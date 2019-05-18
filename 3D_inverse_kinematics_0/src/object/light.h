@@ -21,7 +21,7 @@ public:
 public:
     /// default constructor
     Light(const vec4 _base,
-           const vec3 _base_orientation,
+           const mat4 _base_orientation,
            const float _scale,
            const vec3 _color = vec3(1.0f)) :
         Object(_base, _base_orientation, _scale, LIGHT),

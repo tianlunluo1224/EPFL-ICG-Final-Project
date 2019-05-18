@@ -23,12 +23,17 @@ public:
 public:
     /// default constructor
     Bone(const vec4 _base,
-           const vec3 _base_orientation,
+           const mat4 _base_orientation,
            const float _scale,
            const float _height) :
         Object(_base, _base_orientation, _scale, BONE),
         height_(_height)
     {}
+
+    vec4 end_position() {
+        vec4 axis(base_orientation_(0, 2), base_orientation_(1, 2), base_orientation_(2, 2), 0.0f);
+        return base_ + height_ * axis;
+    }
 
     /// set the time for every update
     void time_step(float _time)
@@ -37,7 +42,7 @@ public:
         // angle_self_  = fmod(angle_self_  + _days * angle_step_self_,  360.0);
     }
 
-    void update_position(const vec4 _prev_endpoint, const vec3 _prev_orientation)
+    void update_position(const vec4 _prev_endpoint, const mat4 _prev_orientation)
     {
         base_ = _prev_endpoint;
         base_orientation_ = _prev_orientation;
@@ -48,9 +53,8 @@ public:
         // the matrices we need: model, modelview, modelview-projection, normal
         mat4 scaling = mat4::scale(scale_, 0.2f * scale_, height_);
         mat4 translation = mat4::translate(vec3(base_));
-        mat4 self_rotation = mat4::rotate_y(base_orientation_.yaw) * mat4::rotate_x(base_orientation_.pitch) * mat4::rotate_z(base_orientation_.roll);
         
-        mat4 m_matrix = translation * self_rotation * scaling;
+        mat4 m_matrix = translation * base_orientation_ * scaling;
         mat4 mv_matrix = _view * m_matrix;
         mat4 mvp_matrix = _projection * mv_matrix;
         mat3 n_matrix = transpose(inverse(mat3(mv_matrix)));
