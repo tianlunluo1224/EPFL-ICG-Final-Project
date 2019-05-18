@@ -170,7 +170,6 @@ void Inv_kin_viewer::resize(int _width, int _height)
 
 //-----------------------------------------------------------------------------
 
-
 void Inv_kin_viewer::initialize()
 {
     unit_sphere_ = Sphere(50);
@@ -275,7 +274,6 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
 
 //-----------------------------------------------------------------------------
 
-enum OBJ_TYPE {OBJECT, BONE, HINGE};
 
 void Inv_kin_viewer::draw_objects(mat4& _projection, mat4& _view)
 {

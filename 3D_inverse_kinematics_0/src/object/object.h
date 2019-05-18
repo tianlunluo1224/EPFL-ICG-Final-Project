@@ -14,6 +14,7 @@
 
 //=============================================================================
 
+enum object_type_t {OBJECT, BONE, HINGE};
 
 /// parent class for objects
 class Object
