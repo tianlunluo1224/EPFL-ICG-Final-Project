@@ -3,8 +3,8 @@
 // Documentation here
 //
 //=============================================================================
-#ifndef Inv_kin_viewer_H
-#define Inv_kin_viewer_H
+#ifndef INV_KIN_VIEWER_H
+#define INV_KIN_VIEWER_H
 //=============================================================================
 
 
