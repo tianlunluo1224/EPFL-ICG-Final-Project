@@ -35,13 +35,6 @@ public:
         return base_ + height_ * axis;
     }
 
-    /// set the time for every update
-    void time_step(float _time)
-    {
-        // angle_orbit_ = fmod(angle_orbit_ + _days * angle_step_orbit_, 360.0);
-        // angle_self_  = fmod(angle_self_  + _days * angle_step_self_,  360.0);
-    }
-
     void update_position(const vec4 _prev_endpoint, const mat4 _prev_orientation)
     {
         base_ = _prev_endpoint;
