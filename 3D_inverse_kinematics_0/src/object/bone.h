@@ -31,7 +31,7 @@ public:
     {}
 
     vec4 end_location() {
-        vec4 axis(base_orientation_(0, 2), base_orientation_(1, 2), base_orientation_(2, 2), 0.0f);
+        vec4 axis(base_orientation_.base_z(), 0.0f);
         return base_location_ + height_ * axis;
     }
 
