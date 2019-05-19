@@ -12,10 +12,15 @@
 #include "glmath.h"
 #include "object/object.h"
 
+class Math_Object;
+
 class Kinematics {
 public:
+    vec4 origin_ = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    mat4 world_orientation_ = mat4::identity();
 
-    std::vector<float> state_;
+    std::vector<std::vector<float>> state_;
+    std::vector<Math_Object*> model_;
 
 public:
 
@@ -28,7 +33,7 @@ public:
 
 protected:
 
-
+    std::pair<vec4, mat4> forward();
 
 };
 
