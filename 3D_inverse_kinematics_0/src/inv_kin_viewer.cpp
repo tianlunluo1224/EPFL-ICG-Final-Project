@@ -144,6 +144,7 @@ void Inv_kin_viewer::update_body_positions() {
     mat4 prev_orientation = mat4::identity();
     
     for (Object* object: object_list_) {
+        object->time_step(time_step_);
         object->update_position(prev_position, prev_orientation);
         prev_position = object->end_position();
         prev_orientation = object->end_orientation();
@@ -160,8 +161,6 @@ void Inv_kin_viewer::timer()
         universe_time_ += time_step_;
         //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
-        // light_.time_step(time_step_);
-        object_list_.at(0)->time_step(time_step_);
         update_body_positions();
     }
 }
