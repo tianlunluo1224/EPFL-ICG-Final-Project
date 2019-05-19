@@ -33,7 +33,7 @@ public:
 
 protected:
 
-    std::pair<vec4, mat4> forward();
+    std::pair<vec4, mat4> forward(std::vector<std::vector<float>> _state);
 
 };
 

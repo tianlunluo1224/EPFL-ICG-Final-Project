@@ -25,11 +25,11 @@ Kinematics::Kinematics(std::vector<Object*> _model_list) {
     }
 }
 
-std::pair<vec4, mat4> Kinematics::forward() {
-    assert(!state_.empty());
+std::pair<vec4, mat4> Kinematics::forward(std::vector<std::vector<float>> _state) {
+    assert(!_state.empty());
 
     std::pair<vec4, mat4> next_coordinates(origin_, world_orientation_);
-    auto state_it = state_.begin();
+    auto state_it = _state.begin();
 
     for (Math_Object* object : model_) {
         next_coordinates = object->forward(next_coordinates, *(state_it++));
