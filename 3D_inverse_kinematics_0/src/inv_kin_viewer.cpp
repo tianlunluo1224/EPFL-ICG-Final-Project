@@ -4,12 +4,14 @@
 //
 //=============================================================================
 
+
 #include "Inv_kin_viewer.h"
 #include "object/object.h"
 #include "glmath.h"
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include <array>
+
 
 //=============================================================================
 
@@ -50,11 +52,11 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
     srand((unsigned int)time(NULL));
 }
 
+
 //-----------------------------------------------------------------------------
 
-void
-Inv_kin_viewer::
-keyboard(int key, int scancode, int action, int mods)
+
+void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
 {
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
@@ -62,20 +64,56 @@ keyboard(int key, int scancode, int action, int mods)
         {
             case GLFW_KEY_8: 
             {
-                float clip = 2.5f;
-                dist_factor_ = dist_factor_ * 0.5f > clip ? dist_factor_ * 0.5f : clip;
+                float clip = 1.0f;
+                dist_factor_ = dist_factor_ - 1.0f > clip ? dist_factor_ - 1.0f : clip;
                 break;
             }
             case GLFW_KEY_9:
             {
-                float clip = 20.0f;
-                dist_factor_ = dist_factor_ * 2.0f < clip ? dist_factor_ * 2.0f : clip;
+                float clip = 50.0f;
+                dist_factor_ = dist_factor_ + 1.0f < clip ? dist_factor_ + 1.0f : clip;
                 break;
             }
 
             case GLFW_KEY_G:
             {
                 greyscale_ = !greyscale_;
+                break;
+            }
+
+            case GLFW_KEY_A:
+            {
+                viewer_.base_.x += 0.5f;
+                break;
+            }
+
+            case GLFW_KEY_D:
+            {
+                viewer_.base_.x -= 0.5f;
+                break;
+            }
+
+            case GLFW_KEY_W:
+            {
+                viewer_.base_.z += 0.5f;
+                break;
+            }
+
+            case GLFW_KEY_S:
+            {
+                viewer_.base_.z -= 0.5f;
+                break;
+            }
+
+            case GLFW_KEY_Q:
+            {
+                viewer_.base_.y += 0.5f;
+                break;
+            }
+
+            case GLFW_KEY_E:
+            {
+                viewer_.base_.y -= 0.5f;
                 break;
             }
 
@@ -136,6 +174,10 @@ keyboard(int key, int scancode, int action, int mods)
     }
 }
 
+
+//-----------------------------------------------------------------------------
+
+
 // Update the current positions of the celestial bodies based their angular distance
 // around their orbits. This position is needed to set up the camera in the scene
 // (see Inv_kin_viewer::paint)
@@ -177,7 +219,9 @@ void Inv_kin_viewer::resize(int _width, int _height)
     glViewport(0, 0, _width, _height);
 }
 
+
 //-----------------------------------------------------------------------------
+
 
 void Inv_kin_viewer::initialize()
 {
@@ -224,6 +268,8 @@ void Inv_kin_viewer::initialize()
     object_list_.erase(object_list_.begin());
     object_list_.erase(object_list_.begin());
 }
+
+
 //-----------------------------------------------------------------------------
 
 
