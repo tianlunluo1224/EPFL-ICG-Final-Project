@@ -601,6 +601,13 @@ public:
     /// pointer to data (for passing it to OpenGL)
     const float* data() const { return data_; }
 
+    /// get transformed basis vector x
+    vec3 base_x();
+    /// get transformed basis vector y
+    vec3 base_y();
+    /// get transformed basis vector z
+    vec3 base_z();
+
     /// return identity matrix
     static mat4 identity();
     /// return frustum matrix
