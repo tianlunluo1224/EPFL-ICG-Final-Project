@@ -83,61 +83,62 @@ void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
 
             case GLFW_KEY_A:
             {
-                viewer_.base_.x += 0.5f;
+                viewer_.base_ = mat4::translate(-viewer_.base_orientation_.base_x()) * viewer_.base_;
                 break;
             }
 
             case GLFW_KEY_D:
             {
-                viewer_.base_.x -= 0.5f;
+                viewer_.base_ = mat4::translate(viewer_.base_orientation_.base_x()) * viewer_.base_;
                 break;
             }
 
             case GLFW_KEY_W:
             {
-                viewer_.base_.z += 0.5f;
+                viewer_.base_ = mat4::translate(-viewer_.base_orientation_.base_z()) * viewer_.base_;
                 break;
             }
 
             case GLFW_KEY_S:
             {
-                viewer_.base_.z -= 0.5f;
+                viewer_.base_ = mat4::translate(viewer_.base_orientation_.base_z()) * viewer_.base_;
                 break;
             }
 
             case GLFW_KEY_Q:
             {
-                viewer_.base_.y += 0.5f;
+                viewer_.base_ = mat4::translate(viewer_.base_orientation_.base_y()) * viewer_.base_;
                 break;
             }
 
             case GLFW_KEY_E:
             {
-                viewer_.base_.y -= 0.5f;
+                viewer_.base_ = mat4::translate(-viewer_.base_orientation_.base_y()) * viewer_.base_;
                 break;
             }
 
             case GLFW_KEY_LEFT:
             {
-                y_angle_ -= 10.0f;
+                viewer_.y_angle_ -= 10.0f;
                 break;
             }
 
             case GLFW_KEY_RIGHT:
             {
-                y_angle_ += 10.0f;
+                viewer_.y_angle_ += 10.0f;
                 break;
             }
 
             case GLFW_KEY_DOWN:
             {
-                x_angle_ += 10.0f;
+                viewer_.x_angle_ += 10.0f;
                 break;
             }
 
             case GLFW_KEY_UP:
             {
-                x_angle_ -= 10.0f;
+                viewer_.x_angle_ -= 10.0f;
+                viewer_.update_position(vec4(), mat4());
                 break;
             }
 
@@ -204,6 +205,7 @@ void Inv_kin_viewer::timer()
         universe_time_ += time_step_;
         //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
+        viewer_.update_position(vec4(), mat4());
         update_body_positions();
     }
 }
@@ -289,21 +291,15 @@ void Inv_kin_viewer::paint()
     eye_pos[2] = eye_pos[2] + dist_factor_;
 
     vec4  center = object_to_look_at_->base_;
-    vec4      up = vec4(0,1,0,0);
 
     mat4 inv_trans = mat4::translate(-vec3(center));
     mat4 trans = mat4::translate(vec3(center));
 
-    mat4 rotation_x = mat4::rotate_x(x_angle_); 
-    mat4 rotation_y = mat4::rotate_y(y_angle_); 
-
-    eye_pos = inv_trans * eye_pos; 
-    eye_pos = rotation_x * eye_pos; 
-    eye_pos = rotation_y * eye_pos; 
+    eye_pos = inv_trans * eye_pos;
+    eye_pos = viewer_.base_orientation_ * eye_pos; 
     eye_pos = trans * eye_pos; 
 
-    up = rotation_x * up; 
-    up = rotation_y * up;
+    vec4 up = vec4(viewer_.base_orientation_.base_y(), 0.0f);
 
     view = mat4::look_at(vec3(eye_pos), vec3(center), vec3(up));
 
