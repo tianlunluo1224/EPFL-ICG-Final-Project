@@ -16,6 +16,8 @@ class Math_Object;
 
 class Kinematics {
 public:
+    float delta_phi_ = 1e-3f;
+
     vec4 origin_ = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     mat4 world_orientation_ = mat4::identity();
 
@@ -34,6 +36,8 @@ public:
 protected:
 
     std::pair<vec4, mat4> forward(std::vector<std::vector<float>> _state);
+
+    std::vector<float> derivative(unsigned int i);
 
 };
 
