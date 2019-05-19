@@ -130,7 +130,7 @@ mat4::mat4(const float s)
 
 
 vec3 mat4::base_x() {
-    return vec3(data_[0 + 0*4], data_[0 + 1*4], data_[0 + 2*4]);
+    return vec3(data_[0 + 0*4], data_[1 + 0*4], data_[2 + 0*4]);
 }
 
 
@@ -138,7 +138,7 @@ vec3 mat4::base_x() {
 
 
 vec3 mat4::base_y() {
-    return vec3(data_[1 + 0*4], data_[1 + 1*4], data_[1 + 2*4]);
+    return vec3(data_[0 + 1*4], data_[1 + 1*4], data_[2 + 1*4]);
 }
 
 
@@ -146,7 +146,7 @@ vec3 mat4::base_y() {
 
 
 vec3 mat4::base_z() {
-    return vec3(data_[2 + 0*4], data_[2 + 1*4], data_[2 + 2*4]);
+    return vec3(data_[0 + 2*4], data_[1 + 2*4], data_[2 + 2*4]);
 }
 
 
