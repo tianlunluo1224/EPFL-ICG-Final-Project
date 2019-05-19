@@ -32,6 +32,10 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
     object_list_.push_back(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
     object_list_.push_back(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 1.0f));
 
+    target_location = vec4(0.1f, 0.0f, 1.0f, 1.0f);
+    target_orientation = mat4::identity();
+
+    math_model_ = Kinematics(object_list_);
 
     // start animation
     timer_active_ = true;
@@ -178,6 +182,20 @@ void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
 //-----------------------------------------------------------------------------
 
 
+void Inv_kin_viewer::update_body_dofs(std::vector<std::vector<float>> next_state) {
+    if (!next_state.empty()) {
+        auto phi_it = next_state.begin();
+
+        for (Object* object: object_list_) {
+            object->update_dof(*(phi_it++));
+        }
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+
+
 // Update the current positions of the celestial bodies based their angular distance
 // around their orbits. This position is needed to set up the camera in the scene
 // (see Inv_kin_viewer::paint)
@@ -205,8 +223,8 @@ void Inv_kin_viewer::timer()
         //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
         viewer_.update_position(vec4(), mat4());
-        // compute_inv_kinematics();
-        // update_body_dofs();
+        std::vector<std::vector<float>> next_state = math_model_.compute_dof(target_location);
+        update_body_dofs(next_state);
         update_body_positions();
     }
 }

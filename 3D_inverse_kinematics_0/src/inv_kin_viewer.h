@@ -11,6 +11,7 @@
 #include "gl.h"
 #include "glfw_window.h"
 
+#include "kinematics.h"
 #include "mesh/sphere.h"
 #include "mesh/cylinder.h"
 #include "shader.h"
@@ -64,6 +65,9 @@ protected:
     /// update function on every timer event (controls the animation)
     virtual void timer();
 
+    /// Writes angles in the objects
+    void update_body_dofs(std::vector<std::vector<float>> next_state);
+
     /// update the body positions (called by the timer).
     void update_body_positions();
 
@@ -73,6 +77,12 @@ private:
     vec4 origin_ = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
     float translation_step_ = 0.5f;
+
+    vec4 target_location;
+
+    mat4 target_orientation;
+
+    Kinematics math_model_;
 
     /// sphere object
     Sphere unit_sphere_;
