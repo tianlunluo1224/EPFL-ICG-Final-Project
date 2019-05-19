@@ -21,7 +21,7 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
       
       //         origin                        orientation             scale (height)
     light_(vec4(0.0f, 10.0f, 0.0f, 1.0f), mat4::identity(), 0.1f, vec3(1.0f)),
-    viewer_(origin_, mat4::identity(), 0.2f, vec3(0.5f))
+    viewer_(origin_, mat4::identity(), 0.1f, vec3(0.0f, 0.5f, 0.0f))
 {
 
     object_list_ = std::vector<Object*>();
@@ -246,6 +246,7 @@ void Inv_kin_viewer::initialize()
                 object->mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);
                 object->tex_.loadPNG(TEXTURE_PATH "/sun.png");
                 break;
+            case VIEWER:
             case LIGHT:
                 object->shader_ = solid_color_shader_;
                 object->mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);

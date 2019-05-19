@@ -18,6 +18,7 @@
 #include "object/hinge.h"
 #include "object/bone.h"
 #include "object/light.h"
+#include "object/viewer.h"
 #include "path.h"
 #include "frame.h"
 #include "bezier.h"
@@ -81,7 +82,7 @@ private:
     Light light_;
 
     /// the object the viewer is looking at
-    Light viewer_;
+    Viewer viewer_;
 
     /// the list which contains all objects in the scene
     std::vector<Object*> object_list_;
