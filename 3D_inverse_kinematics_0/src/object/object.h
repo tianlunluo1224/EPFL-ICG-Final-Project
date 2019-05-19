@@ -51,7 +51,7 @@ public:
         object_type_(_object_type)
     {}
 
-    virtual vec4 end_position() {
+    virtual vec4 end_location() {
         return vec4(base_location_);
     }
 

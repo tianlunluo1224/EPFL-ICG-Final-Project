@@ -189,7 +189,7 @@ void Inv_kin_viewer::update_body_positions() {
     for (Object* object: object_list_) {
         object->time_step(time_step_);
         object->update_position(prev_position, prev_orientation);
-        prev_position = object->end_position();
+        prev_position = object->end_location();
         prev_orientation = object->end_orientation();
     }
 }
