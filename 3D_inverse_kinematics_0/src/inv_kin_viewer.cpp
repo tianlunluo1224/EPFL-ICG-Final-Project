@@ -210,7 +210,7 @@ void Inv_kin_viewer::initialize()
                 object->tex_.loadPNG(TEXTURE_PATH "/day.png");
                 break;
             case HINGE:
-                object->mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);
+                object->mesh_ = dynamic_cast<Mesh*>(&unit_cylinder_);
                 object->tex_.loadPNG(TEXTURE_PATH "/mercury.png");
                 break;
             default:

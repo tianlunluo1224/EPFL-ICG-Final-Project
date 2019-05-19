@@ -19,13 +19,16 @@ public:
     /// angle of rotation around _base_orientation.x axis, 0 degrees is straight
     float rot_angle_;
 
+    float height_;
+
 public:
     /// default constructor
     Hinge(const vec4 _base,
            const mat4 _base_orientation,
            const float _scale) :
         Object(_base, _base_orientation, _scale, HINGE),
-        rot_angle_(0.0f)
+        rot_angle_(0.0f),
+        height_(1.5f * _scale)
     {}
 
     mat4 end_orientation() {
@@ -40,11 +43,15 @@ public:
 
     void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)
     {
-        // the matrices we need: model, modelview, modelview-projection, normal
-        mat4 scaling = mat4::scale(scale_);
+        // assume proper dimensions of the object
+        mat4 scaling = mat4::scale(scale_, scale_, height_);
+        // orient the cylinder perpendicular along the rotation axis
+        mat4 hinge_orientation = mat4::translate(-vec3(0.5f * height_, 0.0f, 0.0f)) * mat4::rotate_y(90.0f);
+
+        // Put the object to its proper world coordinates
         mat4 translation = mat4::translate(vec3(base_));
 
-        mat4 m_matrix = translation * end_orientation() * scaling;
+        mat4 m_matrix = translation * end_orientation() * hinge_orientation * scaling;
         mat4 mv_matrix = _view * m_matrix;
         mat4 mvp_matrix = _projection * mv_matrix;
         mat3 n_matrix = transpose(inverse(mat3(mv_matrix)));
