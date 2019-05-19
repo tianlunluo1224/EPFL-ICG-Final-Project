@@ -72,6 +72,10 @@ public:
     virtual void update_position(const vec4 _prev_endpoint, const mat4 _prev_orientation)
     {
         base_ = _prev_endpoint;
+
+        // Since every base_orientation_ depends on the previous one, we accumulate numerical errors,
+        // but it should be not too much of an issue since the first object always derives from
+        // the identity matrix.
         base_orientation_ = _prev_orientation;
     }
 
