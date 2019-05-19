@@ -49,7 +49,7 @@ public:
         mat4 hinge_orientation = mat4::translate(-vec3(0.5f * height_, 0.0f, 0.0f)) * mat4::rotate_y(90.0f);
 
         // Put the object to its proper world coordinates
-        mat4 translation = mat4::translate(vec3(base_));
+        mat4 translation = mat4::translate(vec3(base_location_));
 
         mat4 m_matrix = translation * end_orientation() * hinge_orientation * scaling;
         mat4 mv_matrix = _view * m_matrix;
@@ -62,7 +62,7 @@ public:
         shader_.set_uniform("normal_matrix", n_matrix);
         shader_.set_uniform("t", 0.0f, true /* Indicate that time parameter is optional;
                                                                 it may be optimized away by the GLSL    compiler if it's unused. */);
-        shader_.set_uniform("light_position", _view * _light.base_);
+        shader_.set_uniform("light_position", _view * _light.base_location_);
         shader_.set_uniform("tex", 0);
         shader_.set_uniform("greyscale", (int)_greyscale);
         

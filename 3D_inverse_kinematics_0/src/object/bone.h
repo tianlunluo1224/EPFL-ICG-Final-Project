@@ -32,12 +32,12 @@ public:
 
     vec4 end_position() {
         vec4 axis(base_orientation_(0, 2), base_orientation_(1, 2), base_orientation_(2, 2), 0.0f);
-        return base_ + height_ * axis;
+        return base_location_ + height_ * axis;
     }
 
     void update_position(const vec4 _prev_endpoint, const mat4 _prev_orientation)
     {
-        base_ = _prev_endpoint;
+        base_location_ = _prev_endpoint;
         base_orientation_ = _prev_orientation;
     }
 
@@ -45,7 +45,7 @@ public:
     {
         // the matrices we need: model, modelview, modelview-projection, normal
         mat4 scaling = mat4::scale(scale_, 0.9f * scale_, height_);
-        mat4 translation = mat4::translate(vec3(base_));
+        mat4 translation = mat4::translate(vec3(base_location_));
         
         mat4 m_matrix = translation * base_orientation_ * scaling;
         mat4 mv_matrix = _view * m_matrix;
@@ -58,7 +58,7 @@ public:
         shader_.set_uniform("normal_matrix", n_matrix);
         shader_.set_uniform("t", 0.0f, true /* Indicate that time parameter is optional;
                                                                 it may be optimized away by the GLSL    compiler if it's unused. */);
-        shader_.set_uniform("light_position", _view * _light.base_);
+        shader_.set_uniform("light_position", _view * _light.base_location_);
         shader_.set_uniform("tex", 0);
         shader_.set_uniform("greyscale", (int)_greyscale);
         

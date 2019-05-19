@@ -83,37 +83,37 @@ void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
 
             case GLFW_KEY_A:
             {
-                viewer_.base_ = mat4::translate(-viewer_.base_orientation_.base_x()) * viewer_.base_;
+                viewer_.base_location_ = mat4::translate(-translation_step_ * viewer_.base_orientation_.base_x()) * viewer_.base_location_;
                 break;
             }
 
             case GLFW_KEY_D:
             {
-                viewer_.base_ = mat4::translate(viewer_.base_orientation_.base_x()) * viewer_.base_;
+                viewer_.base_location_ = mat4::translate(translation_step_ * viewer_.base_orientation_.base_x()) * viewer_.base_location_;
                 break;
             }
 
             case GLFW_KEY_W:
             {
-                viewer_.base_ = mat4::translate(-viewer_.base_orientation_.base_z()) * viewer_.base_;
+                viewer_.base_location_ = mat4::translate(-translation_step_ * viewer_.base_orientation_.base_z()) * viewer_.base_location_;
                 break;
             }
 
             case GLFW_KEY_S:
             {
-                viewer_.base_ = mat4::translate(viewer_.base_orientation_.base_z()) * viewer_.base_;
+                viewer_.base_location_ = mat4::translate(translation_step_ * viewer_.base_orientation_.base_z()) * viewer_.base_location_;
                 break;
             }
 
             case GLFW_KEY_Q:
             {
-                viewer_.base_ = mat4::translate(viewer_.base_orientation_.base_y()) * viewer_.base_;
+                viewer_.base_location_ = mat4::translate(translation_step_ * viewer_.base_orientation_.base_y()) * viewer_.base_location_;
                 break;
             }
 
             case GLFW_KEY_E:
             {
-                viewer_.base_ = mat4::translate(-viewer_.base_orientation_.base_y()) * viewer_.base_;
+                viewer_.base_location_ = mat4::translate(-translation_step_ * viewer_.base_orientation_.base_y()) * viewer_.base_location_;
                 break;
             }
 
@@ -138,7 +138,6 @@ void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
             case GLFW_KEY_UP:
             {
                 viewer_.x_angle_ -= 10.0f;
-                viewer_.update_position(vec4(), mat4());
                 break;
             }
 
@@ -206,6 +205,8 @@ void Inv_kin_viewer::timer()
         //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
         viewer_.update_position(vec4(), mat4());
+        // compute_inv_kinematics();
+        // update_body_dofs();
         update_body_positions();
     }
 }
@@ -284,13 +285,13 @@ void Inv_kin_viewer::paint()
     mat4 view; 
     vec4 eye_pos;
 
-    eye_pos = object_to_look_at_->base_;
+    eye_pos = object_to_look_at_->base_location_;
 
     // Initally, offset the eye_pos from the center of the planet, will
     // be updated by x_angle_ and y_angle_.
     eye_pos[2] = eye_pos[2] + dist_factor_;
 
-    vec4  center = object_to_look_at_->base_;
+    vec4  center = object_to_look_at_->base_location_;
 
     mat4 inv_trans = mat4::translate(-vec3(center));
     mat4 trans = mat4::translate(vec3(center));
@@ -321,7 +322,7 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     mat3 n_matrix;
 
     // convert light into camera coordinates
-    vec4 light = _view * light_.base_;
+    vec4 light = _view * light_.base_location_;
 
     static float sun_animation_time = 0;
     if (timer_active_) sun_animation_time += 0.01f;

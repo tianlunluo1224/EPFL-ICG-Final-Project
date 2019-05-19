@@ -72,6 +72,8 @@ private:
     /// origin of coordinate system
     vec4 origin_ = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
+    float translation_step_ = 0.5f;
+
     /// sphere object
     Sphere unit_sphere_;
 

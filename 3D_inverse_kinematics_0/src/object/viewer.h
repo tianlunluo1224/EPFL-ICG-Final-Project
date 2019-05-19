@@ -41,7 +41,7 @@ public:
     void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)
     {
         mat4 scaling = mat4::scale(scale_);
-        mat4 translation = mat4::translate(vec3(base_));
+        mat4 translation = mat4::translate(vec3(base_location_));
         
         mat4 m_matrix = translation * scaling;
         mat4 mv_matrix = _view * m_matrix;
