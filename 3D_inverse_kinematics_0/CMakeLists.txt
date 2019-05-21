@@ -1,6 +1,9 @@
+cmake_minimum_required(VERSION 3.12)
+
 project(InverseKinematics)
 
-cmake_minimum_required(VERSION 2.8.11)
+include(PrintVariables.cmake)
+print_variables()
 
 # set output paths
 set(PROJECT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
@@ -32,7 +35,7 @@ if (GLEW_FOUND)
   link_libraries(${GLEW_LIBRARIES})
 else()
   MESSAGE("System GLEW not found... falling back to local GLEW")
-  add_subdirectory(lib/glew)
+  add_subdirectory(lib/glew) # Will look for CMakeLists.txt of GLEW there
   set(GLEW_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/lib/glew)
   set(GLEW_LIBRARIES glew)
 endif()
@@ -52,6 +55,8 @@ endif()
 # add source directory to include path
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(${CMAKE_SOURCE_DIR}/lib/lodePNG/)
+# include_directories(${CMAKE_SOURCE_DIR}/lib/OpenBLAS-0.3.6/release/include)
+include_directories(${CMAKE_SOURCE_DIR}/lib/Armadillo-9.400.3)
 
 
 # build source directory
