@@ -74,7 +74,6 @@ public:
     Math_Bone(float _length) : length_(_length) {}
 
     std::pair<vec4, mat4> forward(std::pair<vec4, mat4> _prev_coordinates, std::vector<float> _state) {
-        assert(!state.empty());
         return std::pair<vec4, mat4>(mat4::translate(length_ * _prev_coordinates.second.base_z()) * _prev_coordinates.first,
                                      _prev_coordinates.second);
     }
