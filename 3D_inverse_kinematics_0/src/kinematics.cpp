@@ -27,13 +27,45 @@ Kinematics::Kinematics(std::vector<Object*> _model_list) {
     }
 }
 
+std::vector<std::vector<float>> Kinematics::copy_state() {
+    std::vector<std::vector<float>> new_state;
+    for (auto phi_vec : state_) {
+        new_state.push_back(std::vector<float>(phi_vec));
+    }
+    return new_state;
+}
+
 std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_location) {
-    return std::vector<std::vector<float>>();
+    arma::vec e_current;
+    vec4 current_location = forward(state_).first;
+    for (int i = 0; i < 3; i++) {
+        e_current << current_location[i];
+    }
+
+    arma::vec e_target;
+    for (int i = 0; i < 3; i++) {
+        e_target << _target_location[i];
+    }
+
+    arma::vec delta_e = e_target - e_current;
+
+    arma::mat delta_phi = arma::pinv(J3()) * delta_e;
+
+    int i = 0;
+    std::vector<std::vector<float>> new_state = copy_state();
+    for (auto phi_vec : new_state) {
+        for (float phi : phi_vec) {
+            phi += delta_phi(i++);
+        }
+    }
+
+    return new_state;
 }
 
 std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_location, const mat4 _target_orientation) {
     return std::vector<std::vector<float>>();
 }
+
 
 std::pair<vec4, mat4> Kinematics::forward(std::vector<std::vector<float>> _state) {
     assert(!_state.empty());
@@ -63,10 +95,7 @@ arma::mat Kinematics::J3() {
 
 std::vector<float> Kinematics::derivative(unsigned int n) {
     // make deep copy of state
-    std::vector<std::vector<float>> new_state;
-    for (auto phi_vec : state_) {
-        new_state.push_back(std::vector<float>(phi_vec));
-    }
+    std::vector<std::vector<float>> new_state = copy_state();
 
     // change the i'th DOF by a little bit
     unsigned int i = 0u;

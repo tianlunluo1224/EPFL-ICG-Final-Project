@@ -32,6 +32,8 @@ public:
 
     Kinematics(std::vector<Object*> _model_list);
 
+    std::vector<std::vector<float>> copy_state();
+
     std::vector<std::vector<float>> compute_dof(const vec4 _target_location);
     std::vector<std::vector<float>> compute_dof(const vec4 _target_location, const mat4 _target_orientation);
 
