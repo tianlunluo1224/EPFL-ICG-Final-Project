@@ -16,21 +16,23 @@
 class Math_Object;
 
 class Kinematics {
+public:
+    std::vector<Object*> model_ = std::vector<Object*>();
+
 private:
     float delta_phi_ = 1e-3f;
 
     vec4 origin_ = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     mat4 world_orientation_ = mat4::identity();
 
-    std::vector<Math_Object*> model_;
     std::vector<std::vector<float>> state_;
     size_t n_dofs_ = 0;
 
 public:
 
-    Kinematics() {};
+    void add_object(Object* obj);
 
-    Kinematics(std::vector<Object*> _model_list);
+    void gl_setup(GL_Context& ctx);
 
     std::vector<std::vector<float>> copy_state();
 

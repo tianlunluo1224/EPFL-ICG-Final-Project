@@ -31,6 +31,15 @@ public:
         height_(1.5f * _scale)
     {}
 
+    void gl_setup(GL_Context& ctx)
+    {
+        shader_ = *(ctx.phong_shader);
+        mesh_ = ctx.unit_cylinder;
+
+        tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+        tex_.loadPNG(TEXTURE_PATH "/mercury.png");
+    }
+
     mat4 end_orientation() {
         return mat4::rotate_x(rot_angle_) * base_orientation_;
     }
@@ -44,6 +53,12 @@ public:
     void update_dof(std::vector<float> values)
     {
         rot_angle_ = values.at(0);
+    }
+
+    std::pair<vec4, mat4> forward(std::pair<vec4, mat4> _prev_coordinates, std::vector<float> _state) {
+        assert(!_state.empty());
+        return std::pair<vec4, mat4>(_prev_coordinates.first,
+                                     mat4::rotate_x(_state.at(0)) * _prev_coordinates.second);
     }
 
     void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)

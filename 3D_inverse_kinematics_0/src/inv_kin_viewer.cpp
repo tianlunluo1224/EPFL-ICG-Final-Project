@@ -4,7 +4,6 @@
 //
 //=============================================================================
 
-
 #include "armadillo"
 #include "Inv_kin_viewer.h"
 #include "object/object.h"
@@ -26,18 +25,16 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
 {
     std::cout << "Armadillo version: " << arma::arma_version::as_string() << std::endl;
 
-    object_list_ = std::vector<Object*>();
-    object_list_.push_back(&light_);
-    object_list_.push_back(&viewer_);
-    object_list_.push_back(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
-    object_list_.push_back(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 2.0f));
-    object_list_.push_back(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
-    object_list_.push_back(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 1.0f));
+    math_model_ = Kinematics();
+
+    math_model_.add_object(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
+    math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 2.0f));
+    math_model_.add_object(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
+    math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 1.0f));
 
     target_location_ = vec4(0.0f, 0.5f, 0.0f, 1.0f);
     target_orientation_ = mat4::identity();
 
-    math_model_ = Kinematics(object_list_);
 
     // start animation
     timer_active_ = true;
@@ -84,7 +81,7 @@ void Inv_kin_viewer::update_body_dofs(std::vector<std::vector<float>> next_state
     if (!next_state.empty()) {
         auto phi_it = next_state.begin();
 
-        for (Object* object: object_list_) {
+        for (Object* object: math_model_.model_) {
             object->update_dof(*(phi_it++));
         }
     }
@@ -102,7 +99,7 @@ void Inv_kin_viewer::update_body_positions() {
     vec4 prev_position = origin_;
     mat4 prev_orientation = mat4::identity();
     
-    for (Object* object: object_list_) {
+    for (Object* object: math_model_.model_) {
         // object->time_step(time_step_);
         object->update_position(prev_position, prev_orientation);
         prev_position = object->end_location();
@@ -128,37 +125,16 @@ void Inv_kin_viewer::initialize()
     phong_shader_.load(SHADER_PATH "/phong.vert", SHADER_PATH "/phong.frag");
     solid_color_shader_.load(SHADER_PATH "/solid_color.vert", SHADER_PATH "/solid_color.frag");
 
-    for (Object* object: object_list_) {
-        object->shader_ = phong_shader_;
-        object->tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+    GL_Context ctx;
+    ctx.color_shader = &color_shader_;
+    ctx.solid_color_shader = &solid_color_shader_;
+    ctx.phong_shader = &phong_shader_;
+    ctx.unit_sphere = dynamic_cast<Mesh*>(&unit_sphere_);
+    ctx.unit_cylinder = dynamic_cast<Mesh*>(&unit_cylinder_);
 
-        switch(object->object_type_) {
-            case OBJECT:
-                object->mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);
-                object->tex_.loadPNG(TEXTURE_PATH "/sun.png");
-                break;
-            case VIEWER:
-            case LIGHT:
-                object->shader_ = solid_color_shader_;
-                object->mesh_ = dynamic_cast<Mesh*>(&unit_sphere_);
-                break;
-            case BONE:
-                object->mesh_ = dynamic_cast<Mesh*>(&unit_cylinder_);
-                object->tex_.loadPNG(TEXTURE_PATH "/day.png");
-                break;
-            case HINGE:
-                object->mesh_ = dynamic_cast<Mesh*>(&unit_cylinder_);
-                object->tex_.loadPNG(TEXTURE_PATH "/mercury.png");
-                break;
-            default:
-                assert(false);
-                break;
-        }
-    }
-
-    // Remove the light and viewer objects since we don't need to animate them.
-    object_list_.erase(object_list_.begin());
-    object_list_.erase(object_list_.begin());
+    light_.gl_setup(ctx);
+    viewer_.gl_setup(ctx);
+    math_model_.gl_setup(ctx);
 }
 
 
@@ -232,7 +208,7 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
 
 void Inv_kin_viewer::draw_objects(mat4& _projection, mat4& _view)
 {
-    for (Object* object: object_list_) {
+    for (Object* object: math_model_.model_) {
         object->draw(_projection, _view, light_, greyscale_);
     }
 }

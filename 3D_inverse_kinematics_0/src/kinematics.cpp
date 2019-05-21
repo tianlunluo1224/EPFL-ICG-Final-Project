@@ -7,25 +7,30 @@
 #include <vector>
 
 #include "kinematics.h"
+#include "object/object.h"
 #include "object/bone.h"
 #include "object/hinge.h"
 #include "math_util.h"
 
-Kinematics::Kinematics(std::vector<Object*> _model_list) {
-    for (Object* object : _model_list) {
-        switch(object->object_type_) {
-            case BONE:
-                model_.push_back(new Math_Bone(dynamic_cast<Bone*>(object)->height_));
-                state_.push_back(std::vector<float>());
-                break;
-            case HINGE:
-                model_.push_back(new Math_Hinge());
-                state_.push_back(std::vector<float>(1, 0.0f));
-                n_dofs_++;
-                break;
-            default:
-                break;
-        }
+void Kinematics::add_object(Object* obj) {
+    model_.push_back(obj);
+
+    switch(obj->object_type_) {
+        case BONE:
+            state_.push_back(std::vector<float>());
+            break;
+        case HINGE:
+            state_.push_back(std::vector<float>(1, 0.0f));
+            n_dofs_++;
+            break;
+        default:
+            break;
+    }
+}
+
+void Kinematics::gl_setup(GL_Context& ctx) {
+    for (Object* object: model_) {
+        object->gl_setup(ctx);
     }
 }
 
@@ -73,7 +78,7 @@ std::pair<vec4, mat4> Kinematics::forward(std::vector<std::vector<float>> _state
     std::pair<vec4, mat4> next_coordinates(origin_, world_orientation_);
     auto state_it = _state.begin();
 
-    for (Math_Object* object : model_) {
+    for (Object* object : model_) {
         next_coordinates = object->forward(next_coordinates, *(state_it++));
     }
 

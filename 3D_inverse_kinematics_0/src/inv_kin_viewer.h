@@ -96,9 +96,6 @@ private:
     /// the object the viewer is looking at
     Viewer viewer_;
 
-    /// the list which contains all objects in the scene
-    std::vector<Object*> object_list_;
-    
     /// default color shader (renders only texture)
     Shader   color_shader_;
     /// phong shader (renders texture and basic illumination)

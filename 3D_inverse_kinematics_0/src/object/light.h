@@ -28,6 +28,12 @@ public:
         color_(_color)
     {}
 
+    void gl_setup(GL_Context& ctx)
+    {
+        shader_ = *(ctx.solid_color_shader);
+        mesh_ = ctx.unit_sphere;
+    }
+
     void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)
     {
         mat4 scaling = mat4::scale(scale_);

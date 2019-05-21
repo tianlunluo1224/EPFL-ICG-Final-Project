@@ -33,6 +33,12 @@ public:
         y_angle_(0.0f)
     {}
 
+    void gl_setup(GL_Context& ctx)
+    {
+        shader_ = *(ctx.solid_color_shader);
+        mesh_ = ctx.unit_sphere;
+    }
+
     void update_position(const vec4 _prev_endpoint, const mat4 _prev_orientation)
     {
         base_orientation_ = mat4::rotate_y(y_angle_) * mat4::rotate_x(x_angle_) * mat4::identity();

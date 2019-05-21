@@ -7,12 +7,22 @@
 #define OBJECT_H
 //=============================================================================
 
+#include <utility>
 #include "texture.h"
 #include "mesh/mesh.h"
 #include "shader.h"
 #include "glmath.h"
 
 //=============================================================================
+
+typedef struct {
+    Shader* phong_shader;
+    Shader* solid_color_shader;
+    Shader* color_shader;
+
+    Mesh* unit_sphere;
+    Mesh* unit_cylinder;
+} GL_Context;
 
 enum object_type_t {OBJECT, VIEWER, LIGHT, BONE, HINGE};
 
@@ -51,6 +61,15 @@ public:
         object_type_(_object_type)
     {}
 
+    virtual void gl_setup(GL_Context& ctx)
+    {
+        shader_ = *(ctx.phong_shader);
+        mesh_ = ctx.unit_sphere;
+
+        tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+        tex_.loadPNG(TEXTURE_PATH "/sun.png");
+    }
+
     virtual vec4 end_location() {
         return vec4(base_location_);
     }
@@ -64,6 +83,11 @@ public:
 
     virtual void update_dof(std::vector<float> values)
     {}
+
+    virtual std::pair<vec4, mat4> forward(std::pair<vec4, mat4> _prev_coordinates, std::vector<float> _state)
+    {
+        return _prev_coordinates;
+    }
 
     virtual void update_position(const vec4 _prev_endpoint, const mat4 _prev_orientation)
     {

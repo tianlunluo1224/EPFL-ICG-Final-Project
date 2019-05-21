@@ -30,9 +30,23 @@ public:
         height_(_height)
     {}
 
+    void gl_setup(GL_Context& ctx)
+    {
+        shader_ = *(ctx.phong_shader);
+        mesh_ = ctx.unit_cylinder;
+
+        tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+        tex_.loadPNG(TEXTURE_PATH "/day.png");
+    }
+
     vec4 end_location() {
         vec4 axis(base_orientation_.base_z(), 0.0f);
         return base_location_ + height_ * axis;
+    }
+
+    std::pair<vec4, mat4> forward(std::pair<vec4, mat4> _prev_coordinates, std::vector<float> _state) {
+        return std::pair<vec4, mat4>(mat4::translate(height_ * _prev_coordinates.second.base_z()) * _prev_coordinates.first,
+                                     _prev_coordinates.second);
     }
 
     void update_position(const vec4 _prev_endpoint, const mat4 _prev_orientation)
