@@ -53,11 +53,11 @@ std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_locat
 
     arma::mat delta_phi = arma::pinv(J3()) * delta_e;
 
-    int i = 0;
     std::vector<std::vector<float>> new_state = copy_state();
-    for (auto phi_vec : new_state) {
-        for (float phi : phi_vec) {
-            phi += delta_phi(i++);
+    unsigned int k = 0u;
+    for (int i = 0; i < new_state.size(); i++) {
+        for (int j = 0; j < new_state.at(i).size(); j++) {
+            new_state.at(i).at(j) += (float)delta_phi(k++);
         }
     }
 
@@ -99,12 +99,12 @@ std::vector<float> Kinematics::derivative(unsigned int n) {
     // make deep copy of state
     std::vector<std::vector<float>> new_state = copy_state();
 
-    // change the i'th DOF by a little bit
-    unsigned int i = 0u;
-    for (auto phi_vec : new_state) {
-        for (float phi : phi_vec) {
-            if (i++ == n) {
-                phi += delta_phi_;
+    // change the k'th DOF by a little bit
+    unsigned int k = 0u;
+    for (int i = 0; i < new_state.size(); i++) {
+        for (int j = 0; j < new_state.at(i).size(); j++) {
+            if (k++ == n) {
+                new_state.at(i).at(j) += delta_phi_;
             }
         }
     }
