@@ -38,7 +38,7 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
 
     // start animation
     timer_active_ = true;
-    time_step_ = 1.0f/24.0f; // one hour
+    time_step_ = 1.0f;
 
     // rendering parameters
     greyscale_     = false;
@@ -313,6 +313,13 @@ void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
                 break;
             }
 
+            case GLFW_KEY_R:
+            {
+                math_model_.reset();
+                timer_active_ = false;
+                break;
+            }
+
             case GLFW_KEY_SPACE:
             {
                 timer_active_ = !timer_active_;
@@ -323,7 +330,7 @@ void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
             case GLFW_KEY_KP_ADD:
             case GLFW_KEY_EQUAL:
             {
-                time_step_ *= 2.0f;
+                time_step_ += 0.1f;
                 std::cout << "Time step: " << time_step_ << " days\n";
                 break;
             }
@@ -332,7 +339,7 @@ void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
             case GLFW_KEY_KP_SUBTRACT:
             case GLFW_KEY_MINUS:
             {
-                time_step_ *= 0.5f;
+                time_step_ = time_step_ - 0.1f > 0 ? time_step_ - 0.1f : time_step_;
                 std::cout << "Time step: " << time_step_ << " days\n";
                 break;
             }
