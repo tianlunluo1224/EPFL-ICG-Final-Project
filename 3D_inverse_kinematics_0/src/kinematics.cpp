@@ -58,6 +58,7 @@ std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_locat
         }
     }
 
+    state_ = new_state;
     return new_state;
 }
 
