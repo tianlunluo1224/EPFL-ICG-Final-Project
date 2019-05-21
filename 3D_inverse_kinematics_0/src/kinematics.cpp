@@ -24,7 +24,7 @@ Kinematics::Kinematics(std::vector<Object*> _model_list) {
                 n_dofs_++;
                 break;
             default:
-                assert(false);
+                break;
         }
     }
 }
