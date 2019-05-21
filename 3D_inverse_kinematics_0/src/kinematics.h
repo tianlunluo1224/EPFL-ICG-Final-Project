@@ -20,7 +20,9 @@ public:
     std::vector<Object*> model_ = std::vector<Object*>();
 
 private:
-    float delta_phi_ = 1e-3f;
+    float epsilon_ = 1e-3f;
+
+    float update_scale_ = 1e-3f;
 
     vec4 origin_ = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     mat4 world_orientation_ = mat4::identity();
@@ -36,8 +38,15 @@ public:
 
     std::vector<std::vector<float>> copy_state();
 
-    std::vector<std::vector<float>> compute_dof(const vec4 _target_location);
-    std::vector<std::vector<float>> compute_dof(const vec4 _target_location, const mat4 _target_orientation);
+    void reset();
+
+    /// solves the inverse kinematics problem and sets the new mathematical state
+    void step(const vec4 _target_location, float _time_step);
+
+    /// solves the inverse kinematics problem and sets the new mathematical state
+    void step(const vec4 _target_location, const mat4 _target_orientation, float _time_step);
+
+    void update_body_positions();
 
 protected:
 

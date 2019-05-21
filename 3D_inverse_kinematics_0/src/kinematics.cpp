@@ -12,6 +12,7 @@
 #include "object/hinge.h"
 #include "math_util.h"
 
+
 void Kinematics::add_object(Object* obj) {
     model_.push_back(obj);
 
@@ -28,11 +29,13 @@ void Kinematics::add_object(Object* obj) {
     }
 }
 
+
 void Kinematics::gl_setup(GL_Context& ctx) {
     for (Object* object: model_) {
         object->gl_setup(ctx);
     }
 }
+
 
 std::vector<std::vector<float>> Kinematics::copy_state() {
     std::vector<std::vector<float>> new_state;
@@ -42,7 +45,16 @@ std::vector<std::vector<float>> Kinematics::copy_state() {
     return new_state;
 }
 
-std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_location) {
+void Kinematics::reset() {
+    unsigned int k = 0u;
+    for (int i = 0; i < state_.size(); i++) {
+        for (int j = 0; j < state_.at(i).size(); j++) {
+            state_.at(i).at(j) = 0.0f;
+        }
+    }
+}
+
+void Kinematics::step(const vec4 _target_location, float _time_step) {
     vec4 current_location = forward(state_).first;
 
     arma::vec e_current;
@@ -53,37 +65,46 @@ std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_locat
 
     arma::vec delta_e = e_target - e_current;
 
-    arma::mat delta_phi = arma::pinv(J3()) * delta_e;
-
-    std::vector<std::vector<float>> new_state = copy_state();
-    unsigned int k = 0u;
-    for (int i = 0; i < new_state.size(); i++) {
-        for (int j = 0; j < new_state.at(i).size(); j++) {
-            new_state.at(i).at(j) += (float)delta_phi(k++);
-        }
+    if (arma::norm(delta_e) < 0.01) {
+        return;
     }
 
-    state_ = new_state;
-    return new_state;
+    arma::mat delta_phi = _time_step * update_scale_ * arma::pinv(J3()) * delta_e;
+
+    unsigned int k = 0u;
+    for (int i = 0; i < state_.size(); i++) {
+        for (int j = 0; j < state_.at(i).size(); j++) {
+            state_.at(i).at(j) += (float)delta_phi(k++);
+        }
+    }
 }
 
-std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_location, const mat4 _target_orientation) {
-    return std::vector<std::vector<float>>();
+
+void Kinematics::update_body_positions() {
+    std::pair<vec4, mat4> current_coordinates(origin_, world_orientation_);
+    auto state_it = state_.begin();
+
+    for (Object* object : model_) {
+        object->update_dof(*state_it);
+        object->update_position(current_coordinates.first, current_coordinates.second);
+        current_coordinates = object->forward(current_coordinates, *(state_it++));
+    }
 }
 
 
 std::pair<vec4, mat4> Kinematics::forward(std::vector<std::vector<float>> _state) {
     assert(!_state.empty());
 
-    std::pair<vec4, mat4> next_coordinates(origin_, world_orientation_);
+    std::pair<vec4, mat4> current_coordinates(origin_, world_orientation_);
     auto state_it = _state.begin();
 
     for (Object* object : model_) {
-        next_coordinates = object->forward(next_coordinates, *(state_it++));
+        current_coordinates = object->forward(current_coordinates, *(state_it++));
     }
 
-    return next_coordinates;
+    return current_coordinates;
 }
+
 
 arma::mat Kinematics::J3() {
     arma::mat J(3, n_dofs_);
@@ -107,7 +128,7 @@ std::vector<float> Kinematics::derivative(unsigned int n) {
     for (int i = 0; i < new_state.size(); i++) {
         for (int j = 0; j < new_state.at(i).size(); j++) {
             if (k++ == n) {
-                new_state.at(i).at(j) += delta_phi_;
+                new_state.at(i).at(j) += epsilon_;
             }
         }
     }
@@ -120,11 +141,11 @@ std::vector<float> Kinematics::derivative(unsigned int n) {
 
     std::vector<float> de_dphi;
     for (int i = 0; i < 3; i++) {
-        de_dphi.push_back((e_new.first[i] - e_old.first[i]) / delta_phi_);
+        de_dphi.push_back((e_new.first[i] - e_old.first[i]) / epsilon_);
     }
     
     for (int i = 0; i < 3; i++) {
-        de_dphi.push_back((angles_new[i] - angles_old[i]) / delta_phi_);
+        de_dphi.push_back((angles_new[i] - angles_old[i]) / epsilon_);
     }
 
     return de_dphi;

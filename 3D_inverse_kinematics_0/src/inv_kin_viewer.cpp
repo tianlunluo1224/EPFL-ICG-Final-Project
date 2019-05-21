@@ -32,7 +32,7 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
     math_model_.add_object(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
     math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 1.0f));
 
-    target_location_ = vec4(0.0f, 0.5f, 0.0f, 1.0f);
+    target_location_ = vec4(0.0f, 1.5f, 0.0f, 1.0f);
     target_orientation_ = mat4::identity();
 
 
@@ -67,9 +67,11 @@ void Inv_kin_viewer::timer()
 
         viewer_.update_position(vec4(), mat4());
 
-        std::vector<std::vector<float>> next_state = math_model_.compute_dof(target_location_);
-        update_body_dofs(next_state);
-        update_body_positions();
+        // target_location = bezier_curve_update;
+
+        // make small end effector step towards target_location_
+        math_model_.step(target_location_, time_step_);
+        math_model_.update_body_positions();
     }
 }
 
@@ -94,18 +96,6 @@ void Inv_kin_viewer::update_body_dofs(std::vector<std::vector<float>> next_state
 // Update the current positions of the celestial bodies based their angular distance
 // around their orbits. This position is needed to set up the camera in the scene
 // (see Inv_kin_viewer::paint)
-void Inv_kin_viewer::update_body_positions() {
-
-    vec4 prev_position = origin_;
-    mat4 prev_orientation = mat4::identity();
-    
-    for (Object* object: math_model_.model_) {
-        // object->time_step(time_step_);
-        object->update_position(prev_position, prev_orientation);
-        prev_position = object->end_location();
-        prev_orientation = object->end_orientation();
-    }
-}
 
 
 //-----------------------------------------------------------------------------
