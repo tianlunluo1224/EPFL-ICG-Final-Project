@@ -55,7 +55,7 @@ endif()
 # add source directory to include path
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(${CMAKE_SOURCE_DIR}/lib/lodePNG/)
-# include_directories(${CMAKE_SOURCE_DIR}/lib/OpenBLAS-0.3.6/release/include)
+include_directories(${CMAKE_SOURCE_DIR}/lib/OpenBLAS-0.3.6/release/include)
 include_directories(${CMAKE_SOURCE_DIR}/lib/Armadillo-9.400.3)
 
 
