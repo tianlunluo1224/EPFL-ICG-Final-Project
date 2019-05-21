@@ -21,7 +21,8 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
       
       //         origin                        orientation             scale (height)
     light_(vec4(0.0f, 10.0f, 0.0f, 1.0f), mat4::identity(), 0.1f, vec3(1.0f)),
-    viewer_(origin_, mat4::identity(), 0.1f, vec3(0.0f, 0.5f, 0.0f))
+    viewer_(origin_, mat4::identity(), 0.1f, vec3(0.0f, 0.5f, 0.0f)),
+    target_(vec4(0.0f, 1.5f, 0.0f, 1.0f), mat4::identity(), 0.1f, OBJECT, vec3(0.5f, 0.0f, 0.0f))
 {
     std::cout << "Armadillo version: " << arma::arma_version::as_string() << std::endl;
 
@@ -31,10 +32,6 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
     math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 2.0f));
     math_model_.add_object(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
     math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 1.0f));
-
-    target_location_ = vec4(0.0f, 1.5f, 0.0f, 1.0f);
-    target_orientation_ = mat4::identity();
-
 
     // start animation
     timer_active_ = true;
@@ -70,7 +67,7 @@ void Inv_kin_viewer::timer()
         // target_location = bezier_curve_update;
 
         // make small end effector step towards target_location_
-        math_model_.step(target_location_, time_step_);
+        math_model_.step(target_.base_location_, time_step_);
         math_model_.update_body_positions();
     }
 }
@@ -124,6 +121,7 @@ void Inv_kin_viewer::initialize()
 
     light_.gl_setup(ctx);
     viewer_.gl_setup(ctx);
+    target_.gl_setup(ctx);
     math_model_.gl_setup(ctx);
 }
 
@@ -183,6 +181,7 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
 
     light_.draw(_projection, _view, light_, greyscale_);
     viewer_.draw(_projection, _view, light_, greyscale_);
+    target_.draw(_projection, _view, light_, greyscale_);
 
     draw_objects(_projection, _view);
 
