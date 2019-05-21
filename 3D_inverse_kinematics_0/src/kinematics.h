@@ -60,9 +60,9 @@ public:
 class Math_Hinge : public Math_Object {
 public:
     std::pair<vec4, mat4> forward(std::pair<vec4, mat4> _prev_coordinates, std::vector<float> _state) {
-        assert(!state.empty());
-        return std::pair<vec4, mat4>(mat4::rotate_x(_state.at(0)) * _prev_coordinates.first,
-                                     _prev_coordinates.second);
+        assert(!_state.empty());
+        return std::pair<vec4, mat4>(_prev_coordinates.first,
+                                     mat4::rotate_x(_state.at(0)) * _prev_coordinates.second);
     }
 };
 
