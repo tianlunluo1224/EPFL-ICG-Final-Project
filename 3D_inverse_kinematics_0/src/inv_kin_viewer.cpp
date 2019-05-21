@@ -4,7 +4,7 @@
 //
 //=============================================================================
 
-
+#include "armadillo"
 #include "Inv_kin_viewer.h"
 #include "object/object.h"
 #include "glmath.h"
@@ -23,6 +23,7 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
     light_(vec4(0.0f, 10.0f, 0.0f, 1.0f), mat4::identity(), 0.1f, vec3(1.0f)),
     viewer_(origin_, mat4::identity(), 0.1f, vec3(0.0f, 0.5f, 0.0f))
 {
+    std::cout << "Armadillo version: " << arma::arma_version::as_string() << std::endl;
 
     object_list_ = std::vector<Object*>();
     object_list_.push_back(&light_);
