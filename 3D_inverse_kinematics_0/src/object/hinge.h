@@ -41,6 +41,11 @@ public:
         rot_angle_ += 0.1f;
     }
 
+    void update_dof(std::vector<float> values)
+    {
+        rot_angle_ = values.at(0);
+    }
+
     void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)
     {
         // assume proper dimensions of the object
