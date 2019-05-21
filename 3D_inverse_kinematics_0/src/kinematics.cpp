@@ -16,9 +16,11 @@ Kinematics::Kinematics(std::vector<Object*> _model_list) {
         switch(object->object_type_) {
             case BONE:
                 model_.push_back(new Math_Bone(dynamic_cast<Bone*>(object)->height_));
+                state_.push_back(std::vector<float>());
                 break;
             case HINGE:
                 model_.push_back(new Math_Hinge());
+                state_.push_back(std::vector<float>(1, 0.0f));
                 n_dofs_++;
                 break;
             default:
