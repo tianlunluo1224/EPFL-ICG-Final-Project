@@ -49,25 +49,26 @@ public:
     /// main diffuse texture for the object
     Texture tex_;
 
+    vec3 color_;
+
 public:
     /// default constructor
     Object(const vec4 _base,
            const mat4 _base_orientation,
            const float _scale,
-           const object_type_t _object_type = OBJECT) :
+           const object_type_t _object_type = OBJECT,
+           const vec3 _color = vec3(1.0f)) :
         base_location_(_base),
         base_orientation_(_base_orientation),
         scale_(_scale),
-        object_type_(_object_type)
+        object_type_(_object_type),
+        color_(_color)
     {}
 
     virtual void gl_setup(GL_Context& ctx)
     {
-        shader_ = *(ctx.phong_shader);
+        shader_ = *(ctx.solid_color_shader);
         mesh_ = ctx.unit_sphere;
-
-        tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
-        tex_.loadPNG(TEXTURE_PATH "/sun.png");
     }
 
     virtual vec4 end_location() {
@@ -101,26 +102,17 @@ public:
 
     virtual void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)
     {
-        // the matrices we need: model, modelview, modelview-projection, normal
-        mat4 scaling = scaling = mat4::scale(scale_);
+        mat4 scaling = mat4::scale(scale_);
         mat4 translation = mat4::translate(vec3(base_location_));
         
-        mat4 m_matrix = translation * base_orientation_ * scaling;
+        mat4 m_matrix = translation * scaling;
         mat4 mv_matrix = _view * m_matrix;
         mat4 mvp_matrix = _projection * mv_matrix;
-        mat3 n_matrix = transpose(inverse(mat3(mv_matrix)));
 
         shader_.use();
+        shader_.set_uniform("color", color_);
         shader_.set_uniform("modelview_projection_matrix", mvp_matrix);
-        shader_.set_uniform("modelview_matrix", mv_matrix);
-        shader_.set_uniform("normal_matrix", n_matrix);
-        shader_.set_uniform("t", 0.0f, true /* Indicate that time parameter is optional;
-                                                                it may be optimized away by the GLSL    compiler if it's unused. */);
-        shader_.set_uniform("light_position", _view * _light.base_location_);
-        shader_.set_uniform("tex", 0);
-        shader_.set_uniform("greyscale", (int)_greyscale);
         
-        tex_.bind();
         mesh_->draw();
     }
 };

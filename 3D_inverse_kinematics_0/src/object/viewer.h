@@ -16,7 +16,6 @@
 class Viewer: public Object
 {
 public:
-    vec3 color_;
 
     float x_angle_;
     float y_angle_;
@@ -27,8 +26,7 @@ public:
            const mat4 _base_orientation,
            const float _scale,
            const vec3 _color = vec3(1.0f)) :
-        Object(_base, _base_orientation, _scale, LIGHT),
-        color_(_color),
+        Object(_base, _base_orientation, _scale, LIGHT, _color),
         x_angle_(0.0f),
         y_angle_(0.0f)
     {}
