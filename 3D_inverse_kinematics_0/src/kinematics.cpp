@@ -38,16 +38,13 @@ std::vector<std::vector<float>> Kinematics::copy_state() {
 }
 
 std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_location) {
-    arma::vec e_current;
     vec4 current_location = forward(state_).first;
-    for (int i = 0; i < 3; i++) {
-        e_current << current_location[i];
-    }
+
+    arma::vec e_current;
+    e_current << current_location[0] << current_location[1] << current_location[2];
 
     arma::vec e_target;
-    for (int i = 0; i < 3; i++) {
-        e_target << _target_location[i];
-    }
+    e_target << _target_location[0] << _target_location[1] << _target_location[2];
 
     arma::vec delta_e = e_target - e_current;
 
