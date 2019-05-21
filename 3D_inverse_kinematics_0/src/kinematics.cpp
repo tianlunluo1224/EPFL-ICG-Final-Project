@@ -19,6 +19,7 @@ Kinematics::Kinematics(std::vector<Object*> _model_list) {
                 break;
             case HINGE:
                 model_.push_back(new Math_Hinge());
+                n_dofs_++;
                 break;
             default:
                 assert(false);
@@ -37,6 +38,19 @@ std::pair<vec4, mat4> Kinematics::forward(std::vector<std::vector<float>> _state
     }
 
     return next_coordinates;
+}
+
+arma::mat Kinematics::J3() {
+    arma::mat J(3, n_dofs_);
+
+    for (int i = 0; i < n_dofs_; i++) {
+        std::vector<float> de_dphi = derivative(i);
+        for (int j = 0; j < 3; j++) {
+            J(j, i) = de_dphi.at(j);
+        }
+    }
+
+    return J;
 }
 
 std::vector<float> Kinematics::derivative(unsigned int n) {

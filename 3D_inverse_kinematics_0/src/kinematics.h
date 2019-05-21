@@ -11,18 +11,20 @@
 #include <utility>
 #include "glmath.h"
 #include "object/object.h"
+#include "armadillo"
 
 class Math_Object;
 
 class Kinematics {
-public:
+private:
     float delta_phi_ = 1e-3f;
 
     vec4 origin_ = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     mat4 world_orientation_ = mat4::identity();
 
-    std::vector<std::vector<float>> state_;
     std::vector<Math_Object*> model_;
+    std::vector<std::vector<float>> state_;
+    size_t n_dofs_ = 0;
 
 public:
 
@@ -36,6 +38,9 @@ public:
 protected:
 
     std::pair<vec4, mat4> forward(std::vector<std::vector<float>> _state);
+
+    /// 3 DOF Jacobian of current state
+    arma::mat J3();
 
     std::vector<float> derivative(unsigned int i);
 
