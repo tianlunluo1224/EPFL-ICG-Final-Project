@@ -4,6 +4,7 @@
 //
 //=============================================================================
 
+
 #include "armadillo"
 #include "Inv_kin_viewer.h"
 #include "object/object.h"
@@ -61,121 +62,17 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
 //-----------------------------------------------------------------------------
 
 
-void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
+void Inv_kin_viewer::timer()
 {
-    if (action == GLFW_PRESS || action == GLFW_REPEAT)
-    {
-        switch (key)
-        {
-            case GLFW_KEY_8: 
-            {
-                float clip = 1.0f;
-                dist_factor_ = dist_factor_ - 1.0f > clip ? dist_factor_ - 1.0f : clip;
-                break;
-            }
-            case GLFW_KEY_9:
-            {
-                float clip = 50.0f;
-                dist_factor_ = dist_factor_ + 1.0f < clip ? dist_factor_ + 1.0f : clip;
-                break;
-            }
+    if (timer_active_) {
+        universe_time_ += time_step_;
+        //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
-            case GLFW_KEY_G:
-            {
-                greyscale_ = !greyscale_;
-                break;
-            }
+        viewer_.update_position(vec4(), mat4());
 
-            case GLFW_KEY_A:
-            {
-                viewer_.base_location_ = mat4::translate(-translation_step_ * viewer_.base_orientation_.base_x()) * viewer_.base_location_;
-                break;
-            }
-
-            case GLFW_KEY_D:
-            {
-                viewer_.base_location_ = mat4::translate(translation_step_ * viewer_.base_orientation_.base_x()) * viewer_.base_location_;
-                break;
-            }
-
-            case GLFW_KEY_W:
-            {
-                viewer_.base_location_ = mat4::translate(-translation_step_ * viewer_.base_orientation_.base_z()) * viewer_.base_location_;
-                break;
-            }
-
-            case GLFW_KEY_S:
-            {
-                viewer_.base_location_ = mat4::translate(translation_step_ * viewer_.base_orientation_.base_z()) * viewer_.base_location_;
-                break;
-            }
-
-            case GLFW_KEY_Q:
-            {
-                viewer_.base_location_ = mat4::translate(translation_step_ * viewer_.base_orientation_.base_y()) * viewer_.base_location_;
-                break;
-            }
-
-            case GLFW_KEY_E:
-            {
-                viewer_.base_location_ = mat4::translate(-translation_step_ * viewer_.base_orientation_.base_y()) * viewer_.base_location_;
-                break;
-            }
-
-            case GLFW_KEY_LEFT:
-            {
-                viewer_.y_angle_ -= 10.0f;
-                break;
-            }
-
-            case GLFW_KEY_RIGHT:
-            {
-                viewer_.y_angle_ += 10.0f;
-                break;
-            }
-
-            case GLFW_KEY_DOWN:
-            {
-                viewer_.x_angle_ += 10.0f;
-                break;
-            }
-
-            case GLFW_KEY_UP:
-            {
-                viewer_.x_angle_ -= 10.0f;
-                break;
-            }
-
-            case GLFW_KEY_SPACE:
-            {
-                timer_active_ = !timer_active_;
-                break;
-            }
-
-            case GLFW_KEY_P:
-            case GLFW_KEY_KP_ADD:
-            case GLFW_KEY_EQUAL:
-            {
-                time_step_ *= 2.0f;
-                std::cout << "Time step: " << time_step_ << " days\n";
-                break;
-            }
-
-            case GLFW_KEY_M:
-            case GLFW_KEY_KP_SUBTRACT:
-            case GLFW_KEY_MINUS:
-            {
-                time_step_ *= 0.5f;
-                std::cout << "Time step: " << time_step_ << " days\n";
-                break;
-            }
-
-            case GLFW_KEY_ESCAPE:
-            {
-                glfwSetWindowShouldClose(window_, GL_TRUE);
-                break;
-            }
-        }
+        std::vector<std::vector<float>> next_state = math_model_.compute_dof(target_location_);
+        update_body_dofs(next_state);
+        update_body_positions();
     }
 }
 
@@ -211,35 +108,6 @@ void Inv_kin_viewer::update_body_positions() {
         prev_position = object->end_location();
         prev_orientation = object->end_orientation();
     }
-}
-
-
-//-----------------------------------------------------------------------------
-
-
-void Inv_kin_viewer::timer()
-{
-    if (timer_active_) {
-        universe_time_ += time_step_;
-        //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
-
-        viewer_.update_position(vec4(), mat4());
-
-        std::vector<std::vector<float>> next_state = math_model_.compute_dof(target_location_);
-        update_body_dofs(next_state);
-        update_body_positions();
-    }
-}
-
-
-//-----------------------------------------------------------------------------
-
-
-void Inv_kin_viewer::resize(int _width, int _height)
-{
-    width_  = _width;
-    height_ = _height;
-    glViewport(0, 0, _width, _height);
 }
 
 
@@ -366,6 +234,139 @@ void Inv_kin_viewer::draw_objects(mat4& _projection, mat4& _view)
 {
     for (Object* object: object_list_) {
         object->draw(_projection, _view, light_, greyscale_);
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+
+
+void Inv_kin_viewer::resize(int _width, int _height)
+{
+    width_  = _width;
+    height_ = _height;
+    glViewport(0, 0, _width, _height);
+}
+
+
+//-----------------------------------------------------------------------------
+
+
+void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
+{
+    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+    {
+        switch (key)
+        {
+            case GLFW_KEY_8: 
+            {
+                float clip = 1.0f;
+                dist_factor_ = dist_factor_ - 1.0f > clip ? dist_factor_ - 1.0f : clip;
+                break;
+            }
+            case GLFW_KEY_9:
+            {
+                float clip = 50.0f;
+                dist_factor_ = dist_factor_ + 1.0f < clip ? dist_factor_ + 1.0f : clip;
+                break;
+            }
+
+            case GLFW_KEY_G:
+            {
+                greyscale_ = !greyscale_;
+                break;
+            }
+
+            case GLFW_KEY_A:
+            {
+                viewer_.base_location_ = mat4::translate(-translation_step_ * viewer_.base_orientation_.base_x()) * viewer_.base_location_;
+                break;
+            }
+
+            case GLFW_KEY_D:
+            {
+                viewer_.base_location_ = mat4::translate(translation_step_ * viewer_.base_orientation_.base_x()) * viewer_.base_location_;
+                break;
+            }
+
+            case GLFW_KEY_W:
+            {
+                viewer_.base_location_ = mat4::translate(-translation_step_ * viewer_.base_orientation_.base_z()) * viewer_.base_location_;
+                break;
+            }
+
+            case GLFW_KEY_S:
+            {
+                viewer_.base_location_ = mat4::translate(translation_step_ * viewer_.base_orientation_.base_z()) * viewer_.base_location_;
+                break;
+            }
+
+            case GLFW_KEY_Q:
+            {
+                viewer_.base_location_ = mat4::translate(translation_step_ * viewer_.base_orientation_.base_y()) * viewer_.base_location_;
+                break;
+            }
+
+            case GLFW_KEY_E:
+            {
+                viewer_.base_location_ = mat4::translate(-translation_step_ * viewer_.base_orientation_.base_y()) * viewer_.base_location_;
+                break;
+            }
+
+            case GLFW_KEY_LEFT:
+            {
+                viewer_.y_angle_ -= 10.0f;
+                break;
+            }
+
+            case GLFW_KEY_RIGHT:
+            {
+                viewer_.y_angle_ += 10.0f;
+                break;
+            }
+
+            case GLFW_KEY_DOWN:
+            {
+                viewer_.x_angle_ += 10.0f;
+                break;
+            }
+
+            case GLFW_KEY_UP:
+            {
+                viewer_.x_angle_ -= 10.0f;
+                break;
+            }
+
+            case GLFW_KEY_SPACE:
+            {
+                timer_active_ = !timer_active_;
+                break;
+            }
+
+            case GLFW_KEY_P:
+            case GLFW_KEY_KP_ADD:
+            case GLFW_KEY_EQUAL:
+            {
+                time_step_ *= 2.0f;
+                std::cout << "Time step: " << time_step_ << " days\n";
+                break;
+            }
+
+            case GLFW_KEY_M:
+            case GLFW_KEY_KP_SUBTRACT:
+            case GLFW_KEY_MINUS:
+            {
+                time_step_ *= 0.5f;
+                std::cout << "Time step: " << time_step_ << " days\n";
+                break;
+            }
+
+            case GLFW_KEY_ESCAPE:
+            {
+                glfwSetWindowShouldClose(window_, GL_TRUE);
+                break;
+            }
+        }
     }
 }
 
