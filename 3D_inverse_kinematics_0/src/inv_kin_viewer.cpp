@@ -33,8 +33,8 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
     object_list_.push_back(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
     object_list_.push_back(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 1.0f));
 
-    target_location = vec4(0.1f, 0.0f, 1.0f, 1.0f);
-    target_orientation = mat4::identity();
+    target_location_ = vec4(0.0f, 0.5f, 0.0f, 1.0f);
+    target_orientation_ = mat4::identity();
 
     math_model_ = Kinematics(object_list_);
 
@@ -224,7 +224,8 @@ void Inv_kin_viewer::timer()
         //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
         viewer_.update_position(vec4(), mat4());
-        std::vector<std::vector<float>> next_state = math_model_.compute_dof(target_location);
+
+        std::vector<std::vector<float>> next_state = math_model_.compute_dof(target_location_);
         update_body_dofs(next_state);
         update_body_positions();
     }

@@ -78,9 +78,9 @@ private:
 
     float translation_step_ = 0.5f;
 
-    vec4 target_location;
+    vec4 target_location_;
 
-    mat4 target_orientation;
+    mat4 target_orientation_;
 
     Kinematics math_model_;
 
