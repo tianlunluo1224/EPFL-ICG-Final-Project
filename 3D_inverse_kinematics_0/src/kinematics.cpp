@@ -27,6 +27,14 @@ Kinematics::Kinematics(std::vector<Object*> _model_list) {
     }
 }
 
+std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_location) {
+    return std::vector<std::vector<float>>();
+}
+
+std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_location, const mat4 _target_orientation) {
+    return std::vector<std::vector<float>>();
+}
+
 std::pair<vec4, mat4> Kinematics::forward(std::vector<std::vector<float>> _state) {
     assert(!_state.empty());
 
@@ -86,12 +94,4 @@ std::vector<float> Kinematics::derivative(unsigned int n) {
     }
 
     return de_dphi;
-}
-
-std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_location) {
-    return std::vector<std::vector<float>>();
-}
-
-std::vector<std::vector<float>> Kinematics::compute_dof(const vec4 _target_location, const mat4 _target_orientation) {
-    return std::vector<std::vector<float>>();
 }
