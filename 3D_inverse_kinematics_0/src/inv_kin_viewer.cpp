@@ -305,7 +305,7 @@ void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
             case GLFW_KEY_R:
             {
                 math_model_.reset();
-                timer_active_ = false;
+                // timer_active_ = false;
                 break;
             }
 
