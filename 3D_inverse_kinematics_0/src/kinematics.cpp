@@ -4,6 +4,7 @@
 //
 //=============================================================================
 
+#include <algorithm>
 #include <vector>
 
 #include "kinematics.h"
@@ -71,12 +72,15 @@ void Kinematics::step(const vec4 _target_location, float _time_step) {
         return;
     }
 
-    arma::mat delta_phi = _time_step * update_scale_ * arma::pinv(J3()) * delta_e;
+    arma::vec delta_phi = arma::pinv(J3()) * delta_e;
+
+    // Automatic scaling of update to a maximal absolute change
+    float beta = max_change_ / std::max(max_change_, (float)arma::max(arma::abs(delta_phi)));
 
     unsigned int k = 0u;
     for (int i = 0; i < state_.size(); i++) {
         for (int j = 0; j < state_.at(i).size(); j++) {
-            state_.at(i).at(j) += (float)delta_phi(k++);
+            state_.at(i).at(j) += _time_step * beta * (float)delta_phi(k++);
         }
     }
 }

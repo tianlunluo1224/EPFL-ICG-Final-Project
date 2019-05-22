@@ -22,7 +22,8 @@ public:
 private:
     float epsilon_ = 1e-3f;
 
-    float update_scale_ = 1e-3f;
+    /// Largest allowed change in any state, currently in degrees
+    float max_change_ = 5.0f;
 
     vec4 origin_ = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     mat4 world_orientation_ = mat4::identity();
