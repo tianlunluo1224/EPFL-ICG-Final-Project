@@ -55,7 +55,7 @@ public:
     void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)
     {
         // the matrices we need: model, modelview, modelview-projection, normal
-        mat4 scaling = mat4::scale(scale_, 0.9f * scale_, height_);
+        mat4 scaling = mat4::scale(scale_, scale_, height_);
         mat4 translation = mat4::translate(vec3(base_location_));
         
         mat4 m_matrix = translation * base_orientation_ * scaling;
