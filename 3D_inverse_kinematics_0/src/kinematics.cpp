@@ -62,6 +62,10 @@ void Kinematics::reset() {
 }
 
 void Kinematics::step(const vec4 _target_location, float _time_step) {
+    if (state_.empty()) {
+        return;
+    }
+
     vec4 current_location = forward(state_).first;
 
     arma::vec e_current;
@@ -92,6 +96,10 @@ void Kinematics::step(const vec4 _target_location, float _time_step) {
 
 
 void Kinematics::update_body_positions() {
+    if (state_.empty()) {
+        return;
+    }
+
     std::pair<vec4, mat4> current_coordinates(origin_, mat4::rotate_x(-90.0f) * world_orientation_);
     auto state_it = state_.begin();
 
