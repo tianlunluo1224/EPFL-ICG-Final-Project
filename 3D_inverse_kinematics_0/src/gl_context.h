@@ -12,6 +12,12 @@ typedef struct {
 
     Mesh* unit_sphere;
     Mesh* unit_cylinder;
+
+    Texture* day;
+    Texture* mars;
+    Texture* moon;
+    Texture* pluto;
+
 } GL_Context;
 
 #endif // GL_CONTEXT_H

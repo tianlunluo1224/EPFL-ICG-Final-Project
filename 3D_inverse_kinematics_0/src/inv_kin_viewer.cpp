@@ -121,6 +121,18 @@ void Inv_kin_viewer::initialize()
     ctx.phong_shader = &phong_shader_;
     ctx.unit_sphere = dynamic_cast<Mesh*>(&unit_sphere_);
     ctx.unit_cylinder = dynamic_cast<Mesh*>(&unit_cylinder_);
+    ctx.day   = new Texture();
+    ctx.mars  = new Texture();
+    ctx.moon  = new Texture();
+    ctx.pluto = new Texture();
+    ctx.day->  init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+    ctx.mars-> init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+    ctx.moon-> init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+    ctx.pluto->init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
+    ctx.day->  loadPNG(TEXTURE_PATH "/day.png");
+    ctx.mars-> loadPNG(TEXTURE_PATH "/mars.png");
+    ctx.moon-> loadPNG(TEXTURE_PATH "/moon.png");
+    ctx.pluto->loadPNG(TEXTURE_PATH "/pluto.png");
 
     light_.gl_setup(ctx);
     viewer_.gl_setup(ctx);
