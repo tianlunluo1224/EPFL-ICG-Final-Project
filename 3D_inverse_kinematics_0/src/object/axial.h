@@ -19,29 +19,26 @@ public:
     /// angle of rotation around _base_orientation.x axis, 0 degrees is straight
     float rot_angle_;
 
-    float height_;
-
 public:
     /// default constructor
     Axial(const vec4 _base,
            const mat4 _base_orientation,
            const float _scale) :
         Object(_base, _base_orientation, _scale, AXIAL),
-        rot_angle_(0.0f),
-        height_(1.5f * _scale)
+        rot_angle_(0.0f)
     {}
 
     void gl_setup(GL_Context& ctx)
     {
         shader_ = *(ctx.phong_shader);
-        mesh_ = ctx.unit_cylinder;
+        mesh_ = ctx.unit_sphere;
 
         tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
-        tex_.loadPNG(TEXTURE_PATH "/mercury.png");
+        tex_.loadPNG(TEXTURE_PATH "/pluto.png");
     }
 
     mat4 end_orientation() {
-        return mat4::rotate_y(rot_angle_) * base_orientation_;
+        return base_orientation_ * mat4::rotate_z(rot_angle_);
     }
 
     /// set the time for every update
@@ -58,20 +55,18 @@ public:
     std::pair<vec4, mat4> forward(std::pair<vec4, mat4> _prev_coordinates, std::vector<float> _state) {
         assert(!_state.empty());
         return std::pair<vec4, mat4>(_prev_coordinates.first,
-                                     mat4::rotate_y(_state.at(0)) * _prev_coordinates.second);
+                                     _prev_coordinates.second * mat4::rotate_z(_state.at(0)));
     }
 
     void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)
     {
         // assume proper dimensions of the object
-        mat4 scaling = mat4::scale(scale_, scale_, height_);
-        // orient the cylinder perpendicular along the rotation axis
-        mat4 axial_orientation = mat4::translate(-vec3(0.5f * height_, 0.0f, 0.0f)) * mat4::rotate_y(90.0f);
+        mat4 scaling = mat4::scale(scale_);
 
         // Put the object to its proper world coordinates
         mat4 translation = mat4::translate(vec3(base_location_));
 
-        mat4 m_matrix = translation * end_orientation() * axial_orientation * scaling;
+        mat4 m_matrix = translation * end_orientation() * scaling;
         mat4 mv_matrix = _view * m_matrix;
         mat4 mvp_matrix = _projection * mv_matrix;
         mat3 n_matrix = transpose(inverse(mat3(mv_matrix)));

@@ -37,11 +37,11 @@ public:
         mesh_ = ctx.unit_cylinder;
 
         tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
-        tex_.loadPNG(TEXTURE_PATH "/mercury.png");
+        tex_.loadPNG(TEXTURE_PATH "/moon.png");
     }
 
     mat4 end_orientation() {
-        return mat4::rotate_x(rot_angle_) * base_orientation_;
+        return base_orientation_ * mat4::rotate_x(rot_angle_);
     }
 
     /// set the time for every update
@@ -58,7 +58,7 @@ public:
     std::pair<vec4, mat4> forward(std::pair<vec4, mat4> _prev_coordinates, std::vector<float> _state) {
         assert(!_state.empty());
         return std::pair<vec4, mat4>(_prev_coordinates.first,
-                                     mat4::rotate_x(_state.at(0)) * _prev_coordinates.second);
+                                     _prev_coordinates.second * mat4::rotate_x(_state.at(0)));
     }
 
     void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)
