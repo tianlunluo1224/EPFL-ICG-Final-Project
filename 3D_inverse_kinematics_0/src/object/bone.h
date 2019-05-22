@@ -49,12 +49,6 @@ public:
                                      _prev_coordinates.second);
     }
 
-    void update_position(const vec4 _prev_endpoint, const mat4 _prev_orientation)
-    {
-        base_location_ = _prev_endpoint;
-        base_orientation_ = _prev_orientation;
-    }
-
     void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)
     {
         // the matrices we need: model, modelview, modelview-projection, normal
