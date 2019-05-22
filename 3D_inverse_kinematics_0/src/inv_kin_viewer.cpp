@@ -22,16 +22,20 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
       //         origin                        orientation             scale (height)
     light_(vec4(0.0f, 10.0f, 0.0f, 1.0f), mat4::identity(), 0.1f, vec3(1.0f)),
     viewer_(origin_, mat4::identity(), 0.1f, vec3(0.0f, 0.5f, 0.0f)),
-    target_(vec4(0.5f, 1.5f, 1.0f, 1.0f), mat4::identity(), 0.1f, OBJECT, vec3(0.5f, 0.0f, 0.0f))
+    target_(vec4(1.0f, 1.5f, 0.0f, 1.0f), mat4::identity(), 0.1f, OBJECT, vec3(0.5f, 0.0f, 0.0f))
 {
     std::cout << "Armadillo version: " << arma::arma_version::as_string() << std::endl;
 
     math_model_ = Kinematics();
 
+    math_model_.add_object(new Axial(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
+    math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 0.5f));
     math_model_.add_object(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
     math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 2.0f));
     math_model_.add_object(new Axial(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
-    math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 1.0f));
+    math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 0.5f));
+    math_model_.add_object(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
+    math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 2.0f));
 
     // start animation
     timer_active_ = true;
