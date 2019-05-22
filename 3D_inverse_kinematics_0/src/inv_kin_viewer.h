@@ -17,6 +17,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "object/hinge.h"
+#include "object/axial.h"
 #include "object/bone.h"
 #include "object/light.h"
 #include "object/viewer.h"

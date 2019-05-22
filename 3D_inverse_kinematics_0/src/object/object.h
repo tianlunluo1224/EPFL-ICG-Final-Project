@@ -24,7 +24,7 @@ typedef struct {
     Mesh* unit_cylinder;
 } GL_Context;
 
-enum object_type_t {OBJECT, VIEWER, LIGHT, BONE, HINGE};
+enum object_type_t {OBJECT, VIEWER, LIGHT, BONE, HINGE, AXIAL};
 
 /// parent class for objects
 class Object

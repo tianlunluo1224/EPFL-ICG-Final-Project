@@ -10,6 +10,7 @@
 #include "object/object.h"
 #include "object/bone.h"
 #include "object/hinge.h"
+#include "object/axial.h"
 #include "math_util.h"
 
 
@@ -20,6 +21,7 @@ void Kinematics::add_object(Object* obj) {
         case BONE:
             state_.push_back(std::vector<float>());
             break;
+        case AXIAL:
         case HINGE:
             state_.push_back(std::vector<float>(1, 0.0f));
             n_dofs_++;
