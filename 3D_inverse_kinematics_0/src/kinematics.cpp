@@ -34,6 +34,9 @@ void Kinematics::add_object(Object* obj) {
         default:
             break;
     }
+
+    delta_phi_last_ = arma::vec(n_dofs_);
+    n_small_updates_ = 0u;
 }
 
 
@@ -86,10 +89,22 @@ void Kinematics::step(const vec4 _target_location, float _time_step) {
     // Automatic scaling of update to a maximal absolute change
     float beta = max_change_ / std::max(max_change_, (float)arma::max(arma::abs(delta_phi)));
 
+    arma::vec phi_rand(n_dofs_); phi_rand.fill(0.0f);
+    if (arma::norm(delta_phi) < 1.0f) {
+        if (++n_small_updates_ >= 10) {
+            std::cout << "Local minimum? Perturbing...\n";
+            20 * phi_rand.randu(n_dofs_);
+            n_small_updates_ = 0u;
+        }
+    } else {
+        n_small_updates_ = 0u;
+    }
+
     unsigned int k = 0u;
     for (int i = 0; i < state_.size(); i++) {
         for (int j = 0; j < state_.at(i).size(); j++) {
-            state_.at(i).at(j) += _time_step * beta * (float)delta_phi(k++);
+            state_.at(i).at(j) += _time_step * beta * (float)(delta_phi(k) + phi_rand(k));
+            k++;
         }
     }
 }

@@ -31,6 +31,8 @@ private:
     std::vector<std::vector<float>> state_;
     size_t n_dofs_ = 0;
 
+    arma::vec delta_phi_last_;
+    unsigned int n_small_updates_;
 public:
 
     void add_object(Object* obj);
