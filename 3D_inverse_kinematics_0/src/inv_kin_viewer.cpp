@@ -67,7 +67,7 @@ void Inv_kin_viewer::timer()
         universe_time_ += time_step_;
         //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
-        viewer_.update_position(vec4(), mat4());
+        // viewer_.update_position(vec4(), mat4());
 
         // target_location = bezier_curve_update;
 
@@ -288,24 +288,28 @@ void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
             case GLFW_KEY_LEFT:
             {
                 viewer_.y_angle_ -= 10.0f;
+                viewer_.update_position(vec4(), mat4());
                 break;
             }
 
             case GLFW_KEY_RIGHT:
             {
                 viewer_.y_angle_ += 10.0f;
+                viewer_.update_position(vec4(), mat4());
                 break;
             }
 
             case GLFW_KEY_DOWN:
             {
                 viewer_.x_angle_ += 10.0f;
+                viewer_.update_position(vec4(), mat4());
                 break;
             }
 
             case GLFW_KEY_UP:
             {
                 viewer_.x_angle_ -= 10.0f;
+                viewer_.update_position(vec4(), mat4());
                 break;
             }
 
