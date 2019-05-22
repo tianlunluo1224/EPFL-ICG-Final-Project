@@ -17,7 +17,7 @@
 
 //=============================================================================
 
-enum object_type_t {OBJECT, VIEWER, LIGHT, BONE, HINGE, AXIAL, CYLINDER, AXES};
+enum object_type_t {OBJECT, VIEWER, LIGHT, BONE, HINGE, AXIAL, CYLINDER, BALL};
 
 /// parent class for objects
 class Object

@@ -27,6 +27,10 @@ void Kinematics::add_object(Object* obj) {
             state_.push_back(std::vector<float>(1, 0.0f));
             n_dofs_++;
             break;
+        case BALL:
+            state_.push_back(std::vector<float>(3, 0.0f));
+            n_dofs_ += 3;
+            break;
         default:
             break;
     }

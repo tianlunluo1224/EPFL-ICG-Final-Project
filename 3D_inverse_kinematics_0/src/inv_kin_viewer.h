@@ -22,6 +22,7 @@
 #include "object/light.h"
 #include "object/viewer.h"
 #include "object/axes.h"
+#include "object/ball.h"
 #include "path.h"
 #include "frame.h"
 #include "bezier.h"
