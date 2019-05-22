@@ -23,8 +23,9 @@ public:
     /// default constructor
     Axial(const vec4 _base,
            const mat4 _base_orientation,
-           const float _scale) :
-        Object(_base, _base_orientation, _scale, AXIAL),
+           const float _scale,
+           const bool _enable_axes = false) :
+        Object(_base, _base_orientation, _scale, AXIAL, vec3(0.0f), _enable_axes),
         rot_angle_(0.0f)
     {}
 
@@ -35,6 +36,8 @@ public:
 
         tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
         tex_.loadPNG(TEXTURE_PATH "/pluto.png");
+
+        axes_.gl_setup(ctx);
     }
 
     mat4 end_orientation() {
@@ -83,6 +86,10 @@ public:
         
         tex_.bind();
         mesh_->draw();
+
+        if (enable_axes_) {
+            axes_.draw(_projection, _view);
+        }
     }
 
 };

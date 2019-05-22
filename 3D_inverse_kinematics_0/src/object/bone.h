@@ -25,8 +25,9 @@ public:
     Bone(const vec4 _base,
            const mat4 _base_orientation,
            const float _scale,
-           const float _height) :
-        Object(_base, _base_orientation, _scale, BONE),
+           const float _height,
+           const bool _enable_axes = false):
+        Object(_base, _base_orientation, _scale, BONE, vec3(0.0f), _enable_axes),
         height_(_height)
     {}
 
@@ -37,6 +38,8 @@ public:
 
         tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
         tex_.loadPNG(TEXTURE_PATH "/day.png");
+
+        axes_.gl_setup(ctx);
     }
 
     vec4 end_location() {
@@ -72,6 +75,10 @@ public:
         
         tex_.bind();
         mesh_->draw();
+
+        if (enable_axes_) {
+            axes_.draw(_projection, _view);
+        }
     }
 };
 

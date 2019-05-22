@@ -11,20 +11,13 @@
 #include "texture.h"
 #include "mesh/mesh.h"
 #include "shader.h"
+#include "gl_context.h"
 #include "glmath.h"
+#include "axes.h"
 
 //=============================================================================
 
-typedef struct {
-    Shader* phong_shader;
-    Shader* solid_color_shader;
-    Shader* color_shader;
-
-    Mesh* unit_sphere;
-    Mesh* unit_cylinder;
-} GL_Context;
-
-enum object_type_t {OBJECT, VIEWER, LIGHT, BONE, HINGE, AXIAL};
+enum object_type_t {OBJECT, VIEWER, LIGHT, BONE, HINGE, AXIAL, CYLINDER, AXES};
 
 /// parent class for objects
 class Object
@@ -51,24 +44,33 @@ public:
 
     vec3 color_;
 
+    bool enable_axes_;
+
+    Axes axes_;
+
 public:
     /// default constructor
     Object(const vec4 _base,
            const mat4 _base_orientation,
            const float _scale,
            const object_type_t _object_type = OBJECT,
-           const vec3 _color = vec3(1.0f)) :
+           const vec3 _color = vec3(1.0f),
+           const bool _enable_axes = false) :
         base_location_(_base),
         base_orientation_(_base_orientation),
         scale_(_scale),
         object_type_(_object_type),
-        color_(_color)
+        color_(_color),
+        axes_(_base, _base_orientation, 0.01f, 1.0f),
+        enable_axes_(_enable_axes)
     {}
 
     virtual void gl_setup(GL_Context& ctx)
     {
         shader_ = *(ctx.solid_color_shader);
         mesh_ = ctx.unit_sphere;
+
+        axes_.gl_setup(ctx);
     }
 
     virtual vec4 end_location() {
@@ -98,6 +100,8 @@ public:
         // but it should be not too much of an issue since the first object always derives from
         // the identity matrix.
         base_orientation_ = _prev_orientation;
+
+        axes_.update_position(end_location(), end_orientation());
     }
 
     virtual void draw(mat4& _projection, mat4& _view, Object& _light, bool _greyscale)
@@ -114,6 +118,10 @@ public:
         shader_.set_uniform("modelview_projection_matrix", mvp_matrix);
         
         mesh_->draw();
+
+        if (enable_axes_) {
+            axes_.draw(_projection, _view);
+        }
     }
 };
 
