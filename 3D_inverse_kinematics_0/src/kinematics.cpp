@@ -67,6 +67,7 @@ void Kinematics::step(const vec4 _target_location, float _time_step) {
     e_target << _target_location[0] << _target_location[1] << _target_location[2];
 
     arma::vec delta_e = e_target - e_current;
+    std::cout << "Distance to target: " << arma::norm(delta_e) << std::endl;
 
     if (arma::norm(delta_e) < 0.01) {
         return;
