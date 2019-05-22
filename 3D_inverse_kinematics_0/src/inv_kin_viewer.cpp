@@ -29,14 +29,12 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
 
     math_model_ = Kinematics();
 
-    math_model_.add_object(new Axial(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
-    math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 0.5f));
-    math_model_.add_object(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
-    math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 2.0f));
-    math_model_.add_object(new Axial(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
-    math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 0.5f));
-    math_model_.add_object(new Hinge(vec4(0.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.3f));
-    math_model_.add_object(new Bone(vec4(2.0f, 0.0f, 0.0f, 1.0f), mat4::identity(), 0.2f, 2.0f));
+    math_model_.add_object(new Ball(origin_, mat4::identity(), 0.3f));
+    math_model_.add_object(new Bone(origin_, mat4::identity(), 0.2f, 2.0f));
+    math_model_.add_object(new Axial(origin_, mat4::identity(), 0.3f));
+    math_model_.add_object(new Bone(origin_, mat4::identity(), 0.2f, 0.5f));
+    math_model_.add_object(new Hinge(origin_, mat4::identity(), 0.3f));
+    math_model_.add_object(new Bone(origin_, mat4::identity(), 0.2f, 2.0f, true));
 
     // start animation
     timer_active_ = true;
@@ -69,7 +67,7 @@ void Inv_kin_viewer::timer()
 
         // viewer_.update_position(vec4(), mat4());
 
-        // target_location = bezier_curve_update;
+        // target_.update_position(bezier_curve_update);
 
         // make small end effector step towards target_location_
         math_model_.step(target_.base_location_, time_step_);
