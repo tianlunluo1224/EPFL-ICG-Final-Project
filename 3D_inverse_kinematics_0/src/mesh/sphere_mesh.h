@@ -3,8 +3,8 @@
 // Documentation here
 //
 //=============================================================================
-#ifndef CYLINDER_H
-#define CYLINDER_H
+#ifndef SPHERE_H
+#define SPHERE_H
 //=============================================================================
 
 #include "gl.h"
@@ -13,16 +13,16 @@
 //=============================================================================
 
 /// class that creates a sphere with a desired tessellation degree and renders it
-class Cylinder : public Mesh
+class Sphere_Mesh: public Mesh
 {
 public:
 
     /// default constructor
     /// \param resolution the degree of the tessellation of the sphere
-    Cylinder(unsigned int resolution=10);
+    Sphere_Mesh(unsigned int resolution=10);
 
     /// destructor
-    ~Cylinder();
+    ~Sphere_Mesh();
 
     /// render mesh of the sphere
     void draw(GLenum mode=GL_TRIANGLES);
@@ -56,7 +56,6 @@ private:
     /// index buffer object
     GLuint ibo_ = 0;
 };
-
 
 //=============================================================================
 #endif

@@ -12,8 +12,8 @@
 #include "glfw_window.h"
 
 #include "kinematics.h"
-#include "mesh/sphere.h"
-#include "mesh/cylinder.h"
+#include "mesh/sphere_mesh.h"
+#include "mesh/cylinder_mesh.h"
 #include "shader.h"
 #include "texture.h"
 #include "object/hinge.h"
@@ -84,10 +84,10 @@ private:
     Kinematics math_model_;
 
     /// sphere object
-    Sphere unit_sphere_;
+    Sphere_Mesh unit_sphere_;
 
     /// cylinder object
-    Cylinder unit_cylinder_;
+    Cylinder_Mesh unit_cylinder_;
 
     /// the light object
     Light light_;

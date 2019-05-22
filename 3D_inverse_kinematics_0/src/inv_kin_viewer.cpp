@@ -104,8 +104,8 @@ void Inv_kin_viewer::update_body_dofs(std::vector<std::vector<float>> next_state
 
 void Inv_kin_viewer::initialize()
 {
-    unit_sphere_ = Sphere(50);
-    unit_cylinder_ = Cylinder(50);
+    unit_sphere_ = Sphere_Mesh(50);
+    unit_cylinder_ = Cylinder_Mesh(50);
 
     // set initial state
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
