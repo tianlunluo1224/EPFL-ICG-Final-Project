@@ -22,7 +22,8 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
       //         origin                        orientation             scale (height)
     light_(vec4(0.0f, 10.0f, 0.0f, 1.0f), mat4::identity(), 0.1f, vec3(1.0f)),
     viewer_(origin_, mat4::identity(), 0.1f, vec3(0.0f, 0.5f, 0.0f)),
-    target_(vec4(1.0f, 1.5f, 0.0f, 1.0f), mat4::identity(), 0.1f, OBJECT, vec3(0.5f, 0.0f, 0.0f))
+    target_(vec4(1.0f, 1.5f, 0.0f, 1.0f), mat4::identity(), 0.1f, OBJECT, vec3(0.5f, 0.0f, 0.0f), true),
+    axes_origin_(origin_, mat4::identity(), 0.01f, 1.5f)
 {
     std::cout << "Armadillo version: " << arma::arma_version::as_string() << std::endl;
 
@@ -125,6 +126,7 @@ void Inv_kin_viewer::initialize()
 
     light_.gl_setup(ctx);
     viewer_.gl_setup(ctx);
+    axes_origin_.gl_setup(ctx);
     target_.gl_setup(ctx);
     math_model_.gl_setup(ctx);
 }
@@ -185,6 +187,7 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
 
     light_.draw(_projection, _view, light_, greyscale_);
     viewer_.draw(_projection, _view, light_, greyscale_);
+    axes_origin_.draw(_projection, _view);
     target_.draw(_projection, _view, light_, greyscale_);
 
     draw_objects(_projection, _view);

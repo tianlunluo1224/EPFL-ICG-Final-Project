@@ -21,6 +21,7 @@
 #include "object/bone.h"
 #include "object/light.h"
 #include "object/viewer.h"
+#include "object/axes.h"
 #include "path.h"
 #include "frame.h"
 #include "bezier.h"
@@ -94,6 +95,9 @@ private:
 
     /// the object the viewer is looking at
     Viewer viewer_;
+
+    /// the object the viewer is looking at
+    Axes axes_origin_;
 
     /// default color shader (renders only texture)
     Shader   color_shader_;
