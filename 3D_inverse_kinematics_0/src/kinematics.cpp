@@ -88,7 +88,7 @@ void Kinematics::step(const vec4 _target_location, float _time_step) {
 
 
 void Kinematics::update_body_positions() {
-    std::pair<vec4, mat4> current_coordinates(origin_, world_orientation_);
+    std::pair<vec4, mat4> current_coordinates(origin_, mat4::rotate_x(-90.0f) * world_orientation_);
     auto state_it = state_.begin();
 
     for (Object* object : model_) {
@@ -102,7 +102,7 @@ void Kinematics::update_body_positions() {
 std::pair<vec4, mat4> Kinematics::forward(std::vector<std::vector<float>> _state) {
     assert(!_state.empty());
 
-    std::pair<vec4, mat4> current_coordinates(origin_, world_orientation_);
+    std::pair<vec4, mat4> current_coordinates(origin_, mat4::rotate_x(-90.0f) * world_orientation_);
     auto state_it = _state.begin();
 
     for (Object* object : model_) {
