@@ -15,26 +15,48 @@
 
 //=============================================================================
 
-
 Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
     GLFW_window(_title, _width, _height),
 
       //         origin                        orientation             scale (height)
     light_(vec4(0.0f, 10.0f, 0.0f, 1.0f), mat4::identity(), 0.1f, vec3(1.0f)),
     viewer_(origin_, mat4::identity(), 0.1f, vec3(0.0f, 0.5f, 0.0f)),
-    target_(vec4(1.0f, 1.5f, 0.0f, 1.0f), mat4::identity(), 0.1f, OBJECT, vec3(0.5f, 0.0f, 0.0f), true),
+    target_(vec4(2.0f, 1.5f, 0.0f, 1.0f), mat4::identity(), 0.1f, OBJECT, vec3(0.5f, 0.0f, 0.0f)),
     axes_origin_(origin_, mat4::identity(), 0.01f, 1.5f)
 {
+    // vec4(2.0f, 1.5f, 0.0f, 1.0f)
     std::cout << "Armadillo version: " << arma::arma_version::as_string() << std::endl;
 
     math_model_ = Kinematics();
 
-    math_model_.add_object(new Ball(origin_, mat4::identity(), 0.3f));
-    math_model_.add_object(new Bone(origin_, mat4::identity(), 0.2f, 2.0f));
-    math_model_.add_object(new Axial(origin_, mat4::identity(), 0.3f));
-    math_model_.add_object(new Bone(origin_, mat4::identity(), 0.2f, 0.5f));
+    math_model_.add_object(new Ball(origin_, mat4::identity(), 0.35f));
+    math_model_.add_object(new Bone(origin_, mat4::identity(), 0.15f, 2.0f));
     math_model_.add_object(new Hinge(origin_, mat4::identity(), 0.3f));
-    math_model_.add_object(new Bone(origin_, mat4::identity(), 0.2f, 2.0f, true));
+    math_model_.add_object(new Bone(origin_, mat4::identity(), 0.15f, 1.5f));
+    // math_model_.add_object(new Ball(origin_, mat4::identity(), 0.3f));
+    // math_model_.add_object(new Bone(origin_, mat4::identity(), 0.15f, 2.0f));
+    math_model_.add_object(new Axial(origin_, mat4::identity(), 0.25f));
+    // math_model_.add_object(new Bone(origin_, mat4::identity(), 0.15f, 1.0f));
+
+
+    curr_end_effector = math_model_.update_body_positions();
+    std::cout << curr_end_effector << std::endl;
+
+    n_points = 500;
+    vec4 control_point1(-1.0f, 3.0f, 0.0f, 1.0f);
+    vec4 control_point2(4.0f, 2.5f, 0.0f, 1.0f);
+    // bezier_curve = quadraticBezier(curr_end_effector, control_point1, target_.base_location_, n_points);
+    bezier_curve = cubicBezier(curr_end_effector, control_point1, control_point2, target_.base_location_, n_points);
+
+    line = fitLine(curr_end_effector, target_.base_location_, n_points);
+    bezier_iterator = 1;
+
+    for(int i = 0; i < n_points; i++) {
+        curve_visualization.push_back(new Object(bezier_curve[i], mat4::identity(), 0.05f, OBJECT, vec3(0.5f, 0.0f, 0.0f)));
+        line_visualization.push_back(new Object(line[i], mat4::identity(), 0.05f, OBJECT, vec3(0.0f, 0.5f, 0.0f)));        
+    }
+
+    
 
     // start animation
     timer_active_ = true;
@@ -50,13 +72,109 @@ Inv_kin_viewer::Inv_kin_viewer(const char* _title, int _width, int _height) :
     object_to_look_at_ = dynamic_cast<Object*>(&viewer_);
     x_angle_ = 0.0f;
     y_angle_ = 0.0f;
-    dist_factor_ = 4.5f;
+    dist_factor_ = 9.5f;
 
     srand((unsigned int)time(NULL));
 }
 
+//-----------------------------------------------------------------------------
+
+vec4 Inv_kin_viewer::calculate_next_target(vec4 target, vec4 effector)
+{
+
+    vec3 diff = (vec3)target - (vec3)effector;
+    diff = normalize(diff);
+    float t = 0.005f;
+    vec3 temp = (vec3)effector;
+    const vec3 next_target = temp + t*diff;
+    return vec4(next_target.x, next_target.y, next_target.z, 1.0f);
+
+}
 
 //-----------------------------------------------------------------------------
+
+std::vector<vec4> Inv_kin_viewer::fitLine(vec4 p0, vec4 p1, int t)
+{
+    std::vector<vec4> final_curve (t, vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    final_curve[0] = p0;
+    final_curve[t-1] = p1;
+   
+    vec3 point(0.0f, 0.0f, 0.0f);
+    vec3 diff = (vec3)p1 - (vec3)p0;
+
+    for (int i = 0; i < t-1; i++) {
+        float step = (1.0f / (t+1)) * i;
+        
+        point = (vec3)p0 + step*diff;
+        final_curve[i] = vec4(point.x, point.y, point.z, 1.0f);
+    }
+    return final_curve;
+}
+
+
+//-----------------------------------------------------------------------------
+
+std::vector<vec4> Inv_kin_viewer::quadraticBezier(vec4 p0, vec4 p1, vec4 p2, int t)
+{
+    std::vector<vec4> final_curve (t, vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    final_curve[0] = p0;
+    final_curve[t-1] = p2;
+
+    vec4 point(0.0f, 0.0f, 0.0f, 1.0f);
+
+    for (int i = 1; i < t-1; i++) {
+        float step = (1.0f / (t+1)) * i;
+        point.x = pow(1-step, 2) * p0.x +
+                  (1-step) * 2 * step * p1.x +
+                  step * step * p2.x;
+
+        point.y = pow(1-step, 2) * p0.y +
+                  (1-step) * 2 * step * p1.y +
+                  step * step * p2.y;
+
+        point.z = pow(1-step, 2) * p0.z +
+                  (1-step) * 2 * step * p1.z +
+                  step * step * p2.z;
+        
+        final_curve[i] = point;
+        
+    }
+    return final_curve;
+
+}
+
+//-----------------------------------------------------------------------------
+
+std::vector<vec4> Inv_kin_viewer::cubicBezier(vec4 p0, vec4 p1, vec4 p2, vec4 p3, int t)
+{
+    std::vector<vec4> final_curve (t, vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    final_curve[0] = p0;
+    final_curve[t-1] = p3;
+
+    vec4 point(0.0f, 0.0f, 0.0f, 1.0f);
+
+    for (int i = 1; i < t-1; i++) {
+        float step = (1.0f / (t+1)) * i;
+        point.x = pow(1-step, 3) * p0.x +
+                  pow(1-step, 2) * 3 * step * p1.x +
+                  (1-step) * 3 * step * step * p2.x +
+                  step * step * step * p3.x;
+
+        point.y = pow(1-step, 3) * p0.y +
+                  pow(1-step, 2) * 3 * step * p1.y +
+                  (1-step) * 3 * step * step * p2.y +
+                  step * step * step * p3.y;
+
+        point.z = pow(1-step, 3) * p0.z +
+                  pow(1-step, 2) * 3 * step * p1.z +
+                  (1-step) * 3 * step * step * p2.z +
+                  step * step * step * p3.z;
+        
+        final_curve[i] = point;
+        
+    }
+    return final_curve;
+}
 
 
 void Inv_kin_viewer::timer()
@@ -65,13 +183,18 @@ void Inv_kin_viewer::timer()
         universe_time_ += time_step_;
         //std::cout << "Universe age [days]: " << universe_time_ << std::endl;
 
-        // viewer_.update_position(vec4(), mat4());
+        curr_end_effector = math_model_.update_body_positions();
 
-        // target_.update_position(bezier_curve_update);
+        // calculate next target
+        //vec4 next_target = calculate_next_target(target_.base_location_, curr_end_effector);
+
+        if(bezier_iterator > bezier_curve.size()-1) return;
+
+        vec4 next_target = bezier_curve[bezier_iterator++];
+        //vec4 next_target = line[bezier_iterator++];
 
         // make small end effector step towards target_location_
-        math_model_.step(target_.base_location_, time_step_);
-        math_model_.update_body_positions();
+        math_model_.step(next_target, time_step_);
     }
 }
 
@@ -127,6 +250,12 @@ void Inv_kin_viewer::initialize()
     axes_origin_.gl_setup(ctx);
     target_.gl_setup(ctx);
     math_model_.gl_setup(ctx);
+
+    // set up gl context for the path visualization
+    for (int i = 0; i < n_points; i++) {
+        curve_visualization[i]->gl_setup(ctx);
+        line_visualization[i]->gl_setup(ctx);
+    }
 }
 
 
@@ -184,11 +313,17 @@ void Inv_kin_viewer::draw_scene(mat4& _projection, mat4& _view)
     if (timer_active_) sun_animation_time += 0.01f;
 
     light_.draw(_projection, _view, light_, greyscale_);
-    viewer_.draw(_projection, _view, light_, greyscale_);
-    axes_origin_.draw(_projection, _view);
+  //  viewer_.draw(_projection, _view, light_, greyscale_);
+    //axes_origin_.draw(_projection, _view);
     target_.draw(_projection, _view, light_, greyscale_);
 
     draw_objects(_projection, _view);
+
+    /// draw the path visualization
+    for (int i = 0; i < n_points; i++) {
+        curve_visualization[i]->draw(_projection, _view, light_, greyscale_);
+        line_visualization[i]->draw(_projection, _view, light_, greyscale_);
+    }
 
     glDisable(GL_BLEND);
 
@@ -313,7 +448,32 @@ void Inv_kin_viewer::keyboard(int key, int scancode, int action, int mods)
 
             case GLFW_KEY_R:
             {
-                math_model_.reset();
+                // math_model_.reset();
+                bezier_iterator = 1;
+                target_.base_location_ = vec4(-2.0f, 1.0f, 0.0f, 1.0f);
+
+                vec4 control_point1(-3.0f, 3.0f, 0.5f, 1.0f);
+                vec4 control_point2(5.0f, 2.5f, 0.7f, 1.0f);
+
+                bezier_curve = cubicBezier(curr_end_effector, control_point1, control_point2, target_.base_location_, n_points);
+                // bezier_curve = quadraticBezier(curr_end_effector, control_point1, target_.base_location_, n_points);
+                line = fitLine(curr_end_effector, target_.base_location_, n_points);
+
+                GL_Context ctx;
+                ctx.color_shader = &color_shader_;
+                ctx.solid_color_shader = &solid_color_shader_;
+                ctx.phong_shader = &phong_shader_;
+                ctx.unit_sphere = dynamic_cast<Mesh*>(&unit_sphere_);
+                ctx.unit_cylinder = dynamic_cast<Mesh*>(&unit_cylinder_);
+
+                for(int i = 0; i < n_points; i++) {
+                    curve_visualization[i] = (new Object(bezier_curve[i], mat4::identity(), 0.05f, OBJECT, vec3(0.5f, 0.0f, 0.0f)));
+                    line_visualization[i] =(new Object(line[i], mat4::identity(), 0.05f, OBJECT, vec3(0.0f, 0.5f, 0.0f)));   
+
+                    curve_visualization[i]->gl_setup(ctx);
+                    line_visualization[i]->gl_setup(ctx);     
+                }
+
                 // timer_active_ = false;
                 break;
             }

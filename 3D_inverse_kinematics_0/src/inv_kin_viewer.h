@@ -16,6 +16,7 @@
 #include "mesh/cylinder_mesh.h"
 #include "shader.h"
 #include "texture.h"
+#include "object/object.h"
 #include "object/hinge.h"
 #include "object/axial.h"
 #include "object/bone.h"
@@ -74,7 +75,19 @@ protected:
     /// update the body positions (called by the timer).
     void update_body_positions();
 
+    vec4 calculate_next_target(vec4 target, vec4 effector);
+
+    std::vector<vec4> quadraticBezier(vec4 p0, vec4 p1, vec4 p2, int t);
+
+    std::vector<vec4> fitLine(vec4 p0, vec4 p2, int t);
+
+    std::vector<vec4> cubicBezier(vec4 p0, vec4 p1, vec4 p2, vec4 p3, int t);
+
+
 private:
+
+    std::vector<Object*> curve_visualization;
+    std::vector<Object*> line_visualization;
 
     /// origin of coordinate system
     vec4 origin_ = vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -138,6 +151,18 @@ private:
 
     /// current viewport dimension
     int  width_, height_;
+
+    std::vector<vec4> bezier_curve;
+    std::vector<vec4> line;
+
+    /// iterate over the bezier curve
+    int bezier_iterator;
+
+    /// number of points on the bezier curve
+    int n_points;
+
+    /// current end effector
+    vec4 curr_end_effector;
 };
 
 

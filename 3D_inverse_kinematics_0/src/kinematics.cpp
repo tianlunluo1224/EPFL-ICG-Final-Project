@@ -78,9 +78,9 @@ void Kinematics::step(const vec4 _target_location, float _time_step) {
     e_target << _target_location[0] << _target_location[1] << _target_location[2];
 
     arma::vec delta_e = e_target - e_current;
-    std::cout << "Distance to target: " << arma::norm(delta_e) << std::endl;
+  //  std::cout << "Distance to target: " << arma::norm(delta_e) << std::endl;
 
-    if (arma::norm(delta_e) < 0.01) {
+    if (arma::norm(delta_e) < 0.001) {
         return;
     }
 
@@ -90,10 +90,10 @@ void Kinematics::step(const vec4 _target_location, float _time_step) {
     float beta = max_change_ / std::max(max_change_, (float)arma::max(arma::abs(delta_phi)));
 
     arma::vec phi_rand(n_dofs_); phi_rand.fill(0.0f);
-    if (arma::norm(delta_phi) < 1.0f) {
+    if (arma::norm(delta_phi) < 0.1f) {
         if (++n_small_updates_ >= 10) {
             std::cout << "Local minimum? Perturbing...\n";
-            20 * phi_rand.randu(n_dofs_);
+            phi_rand.randu(n_dofs_);
             n_small_updates_ = 0u;
         }
     } else {
@@ -103,19 +103,19 @@ void Kinematics::step(const vec4 _target_location, float _time_step) {
     unsigned int k = 0u;
     for (int i = 0; i < state_.size(); i++) {
         for (int j = 0; j < state_.at(i).size(); j++) {
-            state_.at(i).at(j) += _time_step * beta * (float)(delta_phi(k) + phi_rand(k));
+            state_.at(i).at(j) += _time_step * (float)(delta_phi(k) + phi_rand(k));
             k++;
         }
     }
 }
 
 
-void Kinematics::update_body_positions() {
-    if (state_.empty()) {
-        return;
-    }
-
+vec4 Kinematics::update_body_positions() {
     std::pair<vec4, mat4> current_coordinates(origin_, mat4::rotate_x(-90.0f) * world_orientation_);
+
+    if (state_.empty()) {
+        return current_coordinates.first;
+    }
     auto state_it = state_.begin();
 
     for (Object* object : model_) {
@@ -123,6 +123,9 @@ void Kinematics::update_body_positions() {
         object->update_position(current_coordinates.first, current_coordinates.second);
         current_coordinates = object->forward(current_coordinates, *(state_it++));
     }
+
+    // return the end effector location
+    return current_coordinates.first;
 }
 
 

@@ -49,7 +49,8 @@ public:
     /// solves the inverse kinematics problem and sets the new mathematical state
     void step(const vec4 _target_location, const mat4 _target_orientation, float _time_step);
 
-    void update_body_positions();
+    /// updates the location and orientation of the objects, return the current end effector
+    vec4 update_body_positions();
 
 protected:
 

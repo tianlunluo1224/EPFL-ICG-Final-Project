@@ -37,7 +37,7 @@ public:
         mesh_ = ctx.unit_cylinder;
 
         tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
-        tex_.loadPNG(TEXTURE_PATH "/day.png");
+        tex_.loadPNG(TEXTURE_PATH "/bone_texture.png");
 
         axes_.gl_setup(ctx);
     }
