@@ -40,7 +40,7 @@ public:
     Shader shader_;
     
     /// main diffuse texture for the object
-    Texture tex_;
+    Texture* tex_;
 
     vec3 color_;
 

@@ -37,10 +37,7 @@ public:
     {
         shader_ = *(ctx.phong_shader);
         mesh_ = ctx.unit_sphere;
-
-        tex_.init(GL_TEXTURE0, GL_TEXTURE_2D, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT);
-        tex_.loadPNG(TEXTURE_PATH "/mars.png");
-
+        tex_ = ctx.mars;
         axes_.gl_setup(ctx);
     }
 
@@ -88,7 +85,7 @@ public:
         shader_.set_uniform("tex", 0);
         shader_.set_uniform("greyscale", (int)_greyscale);
         
-        tex_.bind();
+        tex_->bind();
         mesh_->draw();
 
         if (enable_axes_) {
